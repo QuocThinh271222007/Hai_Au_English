@@ -19,6 +19,11 @@ Hai_Au_English/
 ├── teachers.css        # CSS cho trang teachers (cần tạo)
 ├── contact.css         # CSS cho trang contact (cần tạo)
 ├── main.js             # JavaScript cho chức năng chung
+├── index.js            # JavaScript cho trang chủ
+├── about.js            # JavaScript cho trang giới thiệu (cần tạo)
+├── contact.js          # JavaScript cho trang liên hệ (cần tạo)
+├── courses.js          # JavaScript cho trang khóa học (cần tạo)
+├── teachers.js         # JavaScript cho trang giảng viên (cần tạo)
 ├── auth.js             # JavaScript cho authentication
 └── README.md           # File hướng dẫn này
 ```
