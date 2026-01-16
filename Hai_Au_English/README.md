@@ -5,7 +5,7 @@ Website giới thiệu trung tâm dạy học tiếng Anh IELTS được xây d�
 ## Cấu trúc file
 
 ```
-public/
+Hai_Au_English/
 ├── index.html          # Trang chủ
 ├── about.html          # Trang giới thiệu (cần tạo)
 ├── courses.html        # Trang khóa học (cần tạo)
@@ -14,6 +14,10 @@ public/
 ├── login.html          # Trang đăng nhập
 ├── signup.html         # Trang đăng ký
 ├── styles.css          # File CSS chung
+├── about.css           # CSS cho trang about (cần tạo)
+├── courses.css         # CSS cho trang courses (cần tạo)
+├── teachers.css        # CSS cho trang teachers (cần tạo)
+├── contact.css         # CSS cho trang contact (cần tạo)
 ├── main.js             # JavaScript cho chức năng chung
 ├── auth.js             # JavaScript cho authentication
 └── README.md           # File hướng dẫn này
