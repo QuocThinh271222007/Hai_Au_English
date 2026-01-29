@@ -1,4 +1,4 @@
-# IELTS Excellence Website - HTML/CSS/JS
+# Hải Âu English Website - HTML/CSS/JS
 
 Website giới thiệu trung tâm dạy học tiếng Anh IELTS được xây dựng bằng HTML, CSS thuần túy và JavaScript.
 
@@ -179,7 +179,7 @@ Thêm meta tags vào `<head>`:
 ```html
 <meta name="description" content="Mô tả trang web">
 <meta name="keywords" content="IELTS, học tiếng Anh">
-<meta property="og:title" content="IELTS Excellence">
+<meta property="og:title" content="Hải Âu English">
 <meta property="og:image" content="url-to-image">
 ```
 
@@ -219,4 +219,4 @@ Nếu cần hỗ trợ, liên hệ:
 
 ## License
 
-© 2026 IELTS Excellence. All rights reserved.
+© 2026 Hải Âu English. All rights reserved.
