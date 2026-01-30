@@ -1,219 +1,189 @@
 # Hải Âu English - Full Stack Web Application
 
-Website giới thiệu và quản lý trung tâm dạy học tiếng Anh IELTS được xây dựng với mô hình **Backend + Frontend** thực tế.
+Website giới thiệu và quản lý trung tâm dạy học tiếng Anh IELTS được xây dựng với mô hình **Backend (PHP/MySQL) + Frontend (HTML/CSS/JS)**.
 
-## 🏗️ Cấu trúc dự án (MVC + API)
+> **Lưu ý:** Dự án đã chuyển sang sử dụng **PHP + MySQL** cho backend thay vì Node.js. Các file Node.js cũ vẫn còn trong `backend/src/` nhưng không còn sử dụng.
+
+## 🏗️ Cấu trúc dự án
 
 ```
 Hai_Au_English/
 │
-├── backend/                    # API Backend (Node.js + Express)
-│   ├── src/
-│   │   ├── controllers/        # Business logic handlers
-│   │   │   ├── authController.js       # Xử lý đăng nhập, đăng ký
-│   │   │   ├── courseController.js     # Xử lý khóa học
-│   │   │   ├── contactController.js    # Xử lý form liên hệ
-│   │   │   └── userController.js       # Xử lý thông tin người dùng
-│   │   │
-│   │   ├── models/             # Database schemas (MongoDB)
-│   │   │   ├── User.js
-│   │   │   ├── Course.js
-│   │   │   └── Contact.js
-│   │   │
-│   │   ├── routes/             # API endpoints
-│   │   │   ├── auth.js         # POST /api/auth/login, /register
-│   │   │   ├── courses.js       # GET /api/courses, POST (admin)
-│   │   │   ├── contacts.js      # POST /api/contacts, GET (admin)
-│   │   │   └── users.js         # GET /api/users/profile, PUT
-│   │   │
-│   │   ├── middleware/         # Authentication, error handling
-│   │   │   └── auth.js
-│   │   │
-│   │   ├── config/             # Database configuration
-│   │   │   └── database.js
-│   │   │
-│   │   └── server.js           # Entry point
+├── backend/
+│   ├── php/                    # 🆕 API Backend PHP (đang sử dụng)
+│   │   ├── db.php              # Kết nối MySQL
+│   │   ├── auth.php            # Đăng ký, đăng nhập
+│   │   ├── users.php           # Quản lý user (admin)
+│   │   ├── courses.php         # Quản lý khóa học
+│   │   ├── contact.php         # Xử lý form liên hệ
+│   │   └── README.md           # Hướng dẫn backend PHP
 │   │
-│   ├── package.json            # Dependencies
-│   ├── .env.example            # Environment variables template
-│   └── .env                    # Environment variables (local)
+│   ├── src/                    # ⚠️ Backend Node.js cũ (không còn sử dụng)
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── config/
+│   │   └── server.js
+│   │
+│   ├── create_db.sql           # SQL tạo database và bảng contacts
+│   ├── update_db.sql           # SQL tạo bảng users, courses
+│   ├── package.json            # Dependencies Node.js (không còn sử dụng)
+│   └── .env.example            # Environment variables (không còn sử dụng)
+│
 │
 ├── frontend/                   # Client-side (HTML/CSS/JS)
-├── views/                  # Thư mục chứa file HTML (Views)
-│   ├── index.html          # Trang chủ
-│   ├── about.html          # Trang giới thiệu    
-│   ├── courses.html        # Trang khóa học
-│   ├── teachers.html       # Trang giảng viên
-│   ├── contact.html        # Trang liên hệ        
-│   ├── login.html          # Trang đăng nhập
-│   ├── signup.html         # Trang đăng ký    
-│   └── test.html           # Trang test
+│   ├── index.html              # Trang chủ
+│   ├── pages/                  # Các trang HTML
+│   │   ├── about.html          # Giới thiệu
+│   │   ├── courses.html        # Khóa học
+│   │   ├── teachers.html       # Giảng viên
+│   │   ├── contact.html        # Liên hệ
+│   │   ├── login.html          # Đăng nhập
+│   │   └── signup.html         # Đăng ký
+│   │
+│   ├── css/
+│   │   ├── styles.css          # CSS chung
+│   │   └── pages/              # CSS riêng từng trang
+│   │
+│   ├── js/
+│   │   ├── services/           # Gọi API PHP
+│   │   │   ├── authService.js
+│   │   │   ├── courseService.js
+│   │   │   └── contactService.js
+│   │   ├── controllers/        # Xử lý form, UI
+│   │   │   ├── auth.js
+│   │   │   ├── contact.js
+│   │   │   ├── courses.js
+│   │   │   └── main.js
+│   │   ├── animations/         # Animation UI
+│   │   │   └── uiAnimations.js
+│   │   └── ui/
+│   │       └── toast.js
+│   │
+│   └── assets/                 # Ảnh, fonts
 │
-├── css/                    # Thư mục CSS
-│   ├── styles.css          # CSS chung (import Tailwind)
-│   └── pages/              # CSS riêng cho từng trang
-│       ├── about.css       # Custom CSS trang giới thiệu
-│       ├── contact.css     # Custom CSS trang liên hệ
-│       ├── courses.css     # Custom CSS trang khóa học
-│       ├── index.css       # Custom CSS trang chủ
-│       ├── teachers.css    # Custom CSS trang giảng viên
-│       └── test.css        # Custom CSS trang test
-│
-├── controllers/            # Thư mục chứa logic xử lý (Controllers)
-│   ├── auth.js             # Frontend auth handling
-│   ├── contact.js          # Frontend contact handling
-│   ├── courses.js          # Frontend courses handling
-│   └── main.js             # Frontend global behavior
-│
-├── js/                     # Thư mục chứa utilities & helpers
-│   ├── utils.js            # Hàm tiện ích
-│   ├── validation.js       # Validation functions
-│   ├── api.js              # API Client (gọi backend)
-│   ├── services/           # API Services
-│   │   ├── authService.js
-│   │   ├── courseService.js
-│   │   └── contactService.js
-│   ├── controllers/        # Frontend logic controllers (form handling, UI logic)
-│   ├── animations/         # Animation & UI behaviors (scroll, lazy load, anchors)
-│   └── ui/                 # Shared UI helpers (toasts, modals)
-│
-├── assets/                 # Static files
-│   ├── images/
-│   └── fonts/
-│
-├── index.html              # Landing page
-│
-├── README.md               # File hướng dẫn
-├── MIGRATION_GUIDE.md      # Hướng dẫn migration
-└── package.json            # Root dependencies (optional)
+├── README.md
+└── MIGRATION_GUIDE.md
 ```
 
 ## 🔄 Kiến trúc Backend-Frontend
 
-### Backend (Node.js/Express)
-- **Port**: 5000
-- **API Base**: `http://localhost:5000/api`
-- **Database**: MongoDB
-- **Authentication**: JWT (JSON Web Tokens)
+### Backend (PHP/MySQL) - Đang sử dụng
+- **Server**: Apache (XAMPP)
+- **API Base**: `http://localhost/hai_au_backend/`
+- **Database**: MySQL
+- **Authentication**: Session-based (password_hash/password_verify)
 
 ### Frontend (Vanilla HTML/CSS/JS)
-- **Port**: 3000 (khi dùng Live Server)
+- **Server**: Apache hoặc Live Server
 - **API Client**: Fetch API
-- **Storage**: localStorage (sessions, tokens)
+- **Storage**: localStorage (sessions)
 
-## 📚 API Endpoints
+## 📚 API Endpoints (PHP)
 
-### Authentication
+### Authentication (`auth.php`)
 ```
-POST   /api/auth/register        - Đăng ký tài khoản mới
-POST   /api/auth/login           - Đăng nhập
-POST   /api/auth/logout          - Đăng xuất
-POST   /api/auth/refresh-token   - Làm mới token
+POST   backend/php/auth.php?action=register   - Đăng ký tài khoản mới
+POST   backend/php/auth.php?action=login      - Đăng nhập
 ```
 
-### Courses
+### Courses (`courses.php`)
 ```
-GET    /api/courses              - Lấy danh sách khóa học
-GET    /api/courses/:id          - Lấy chi tiết khóa học
-POST   /api/courses              - Tạo khóa học (admin)
-PUT    /api/courses/:id          - Cập nhật khóa học (admin)
-DELETE /api/courses/:id          - Xóa khóa học (admin)
+GET    backend/php/courses.php                - Lấy danh sách khóa học
+POST   backend/php/courses.php                - Thêm khóa học
+DELETE backend/php/courses.php?id=...         - Xóa khóa học
 ```
 
-### Contacts
+### Contacts (`contact.php`)
 ```
-POST   /api/contacts             - Gửi form liên hệ
-GET    /api/contacts             - Lấy danh sách liên hệ (admin)
-GET    /api/contacts/:id         - Lấy chi tiết liên hệ (admin)
-PUT    /api/contacts/:id/status  - Cập nhật trạng thái (admin)
-DELETE /api/contacts/:id         - Xóa liên hệ (admin)
+POST   backend/php/contact.php                - Gửi form liên hệ
 ```
 
-### Users
+### Users (`users.php`)
 ```
-GET    /api/users/profile        - Lấy thông tin người dùng (auth required)
-PUT    /api/users/profile        - Cập nhật thông tin (auth required)
-POST   /api/users/change-password - Đổi mật khẩu (auth required)
-GET    /api/users                - Danh sách người dùng (admin)
+GET    backend/php/users.php                  - Lấy danh sách user (admin)
+DELETE backend/php/users.php?id=...           - Xóa user (admin)
 ```
 
-## 🚀 Cài đặt và Chạy
+## 🚀 Cài đặt và Chạy (XAMPP)
 
-### 1️⃣ Cài đặt Backend
-
-```bash
-# Di chuyển vào thư mục backend
-cd backend
-
-# Cài đặt dependencies
-npm install
-
-# Tạo file .env từ .env.example
-cp .env.example .env
-
-# Cấu hình .env với thông tin MongoDB của bạn
-# DB_URI=mongodb://localhost:27017/hai-au-english
-# JWT_SECRET=your_secret_key
-# PORT=5000
-
-# Chạy development server
-npm run dev
-
-# Server sẽ chạy tại http://localhost:5000
+### 1️⃣ Cài đặt XAMPP
+```
+1. Tải XAMPP: https://www.apachefriends.org/index.html
+2. Cài đặt và mở XAMPP Control Panel
+3. Bật Apache và MySQL
 ```
 
-### 2️⃣ Chạy Frontend
-
-**Option A: Live Server (VS Code)**
+### 2️⃣ Import Database
 ```
-1. Cài extension "Live Server"
-2. Click phải vào frontend/views/index.html
-3. Chọn "Open with Live Server"
-4. Server sẽ chạy tại http://localhost:5500
+1. Mở http://localhost/phpmyadmin
+2. Import file: backend/create_db.sql (tạo DB và bảng contacts)
+3. Import file: backend/update_db.sql (tạo bảng users, courses)
 ```
 
-**Option B: Python HTTP Server**
-```bash
-# Từ thư mục gốc
-python -m http.server 3000
-
-# Truy cập http://localhost:3000/frontend/views/
+### 3️⃣ Copy mã nguồn vào XAMPP
+```
+1. Copy thư mục backend/php vào C:/xampp/htdocs/hai_au_backend
+2. Copy thư mục frontend vào C:/xampp/htdocs/hai_au_frontend
 ```
 
-### 3️⃣ Cấu hình API URL
+### 4️⃣ Cấu hình kết nối MySQL
+Sửa file `hai_au_backend/db.php` nếu cần:
+```php
+$DB_HOST = '127.0.0.1';
+$DB_USER = 'root';      // Mặc định XAMPP
+$DB_PASS = '';          // Mặc định XAMPP (rỗng)
+$DB_NAME = 'hai_au_english';
+```
 
-Sửa file `frontend/js/api.js`:
+### 5️⃣ Truy cập website
+```
+http://localhost/hai_au_frontend/index.html
+```
+
+### 6️⃣ Cấu hình API URL trong frontend
+Sửa các file trong `frontend/js/services/` nếu đường dẫn PHP khác:
 ```javascript
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE = 'backend/php/auth.php';  // hoặc đường dẫn tuyệt đối
 ```
 
 ## 💾 Yêu cầu Hệ thống
 
-- **Node.js**: v14+ (cho backend)
-- **MongoDB**: v4.4+ (cơ sở dữ liệu)
+- **XAMPP**: v8.0+ (Apache + MySQL + PHP)
+- **PHP**: v7.4+ (có sẵn trong XAMPP)
+- **MySQL**: v5.7+ (có sẵn trong XAMPP)
 - **Browser**: Chrome, Firefox, Safari, Edge (mới nhất)
 
 ## 📝 Hướng dẫn Phát triển
 
-### Thêm tính năng mới trong Backend
+### Thêm tính năng mới trong Backend PHP
 
-1. **Tạo Controller** (`backend/src/controllers/`)
-     ```javascript
-     export const handleRequest = async (req, res) => {
+1. **Tạo file PHP mới** (`backend/php/`)
+     ```php
+     <?php
+     header('Content-Type: application/json; charset=utf-8');
+     $mysqli = require __DIR__ . '/db.php';
+     
+     // Xử lý request
+     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+         $data = json_decode(file_get_contents('php://input'), true);
          // Business logic
+         echo json_encode(['success' => true]);
+     }
+     ```
+
+2. **Tạo service JS tương ứng** (`frontend/js/services/`)
+     ```javascript
+     const API_BASE = 'backend/php/your_api.php';
+     export const yourService = {
+         async doSomething(data) {
+             const res = await fetch(API_BASE, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify(data)
+             });
+             return res.json();
+         }
      };
-     ```
-
-2. **Tạo Route** (`backend/src/routes/`)
-     ```javascript
-     import { handleRequest } from '../controllers/...';
-     router.get('/path', handleRequest);
-     ```
-
-3. **Đăng ký Route** trong `server.js`
-     ```javascript
-     import newRoutes from './routes/...';
-     app.use('/api/endpoint', newRoutes);
      ```
 
 ### Gọi API từ Frontend
@@ -316,17 +286,16 @@ const result = await contactService.submitContact({
 ## 🛠️ Công cụ và Công nghệ
 
 **Backend:**
-- Express.js - Web framework
-- MongoDB - Database
-- Mongoose - ODM (Object Data Modeling)
-- JWT - Authentication
-- bcryptjs - Password hashing
-- Nodemon - Development tool
+- PHP 7.4+ - Server-side scripting
+- MySQL - Database
+- MySQLi - Database driver
+- password_hash/password_verify - Password hashing
+- Apache (XAMPP) - Web server
 
 **Frontend:**
 - HTML5 - Markup
 - CSS3 + Tailwind - Styling
-- Vanilla JavaScript - Interaction
+- Vanilla JavaScript (ES6+) - Interaction
 - Fetch API - HTTP requests
 - localStorage - Client storage
 
@@ -344,10 +313,10 @@ const result = await contactService.submitContact({
 - [x] Responsive design
 
 ### 📝 Cần hoàn thành
-- [ ] MongoDB Models
-- [ ] Password hashing (bcryptjs)
-- [ ] JWT token generation
-- [ ] Authentication middleware
+- [x] MySQL Database (đã có)
+- [x] Password hashing (password_hash)
+- [ ] Session-based authentication
+- [ ] Admin middleware
 - [ ] Input validation middleware
 - [ ] Error handling middleware
 - [ ] Email notifications
@@ -356,42 +325,38 @@ const result = await contactService.submitContact({
 
 ## 🐛 Troubleshooting
 
-### Backend không chạy
-```bash
-# Kiểm tra Node.js version
-node --version  # Should be v14+
-
-# Kiểm tra MongoDB
-# Ensure MongoDB service is running
-
-# Xóa node_modules và cài lại
-rm -r backend/node_modules
-cd backend && npm install
+### Backend PHP không chạy
+```
+1. Kiểm tra Apache và MySQL đã bật trong XAMPP Control Panel
+2. Kiểm tra file db.php có đúng thông tin kết nối MySQL không
+3. Kiểm tra database đã import chưa (vào phpMyAdmin kiểm tra)
+4. Kiểm tra đường dẫn file PHP có đúng không (404 error)
 ```
 
 ### Frontend không kết nối được backend
-```javascript
-// Kiểm tra API URL trong frontend/js/api.js
-const API_BASE_URL = 'http://localhost:5000/api';
-
-// Kiểm tra CORS setting trong backend/src/server.js
-// Origin phải là frontend URL của bạn
+```
+1. Kiểm tra đường dẫn API trong frontend/js/services/*.js
+2. Mở Console (F12) để xem lỗi chi tiết
+3. Kiểm tra CORS - nếu lỗi, đảm bảo truy cập từ localhost
+4. Kiểm tra file PHP có lỗi syntax không (xem Apache error log)
 ```
 
-### Token hết hạn
-```javascript
-// Tự động refresh token
-const refreshToken = async () => {
-    const response = await APIClient.post('/auth/refresh-token', {});
-    APIClient.setToken(response.token);
-};
+### Lỗi kết nối database
+```php
+// Kiểm tra thông tin trong backend/php/db.php
+$DB_HOST = '127.0.0.1';
+$DB_USER = 'root';
+$DB_PASS = '';  // Mặc định XAMPP là rỗng
+$DB_NAME = 'hai_au_english';
 ```
 
 ## 📖 Tài liệu Thêm
 
-- [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - Hướng dẫn chi tiết migration từ single-page sang full-stack
-- [Express.js Documentation](https://expressjs.com)
-- [MongoDB Documentation](https://docs.mongodb.com)
+- [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) - Hướng dẫn chi tiết migration
+- [backend/php/README.md](backend/php/README.md) - Hướng dẫn backend PHP
+- [PHP Documentation](https://www.php.net/docs.php)
+- [MySQL Documentation](https://dev.mysql.com/doc/)
+- [XAMPP](https://www.apachefriends.org/)
 - [Tailwind CSS](https://tailwindcss.com)
 
 ## 👥 Contributors
@@ -545,9 +510,9 @@ Thêm styles vào file `styles.css`:
 
 ### Cần tạo thêm 📝
 
-- [ ] Backend API integration
-- [ ] Real authentication system
-- [ ] Database connection
+- [x] Backend API integration (PHP)
+- [x] Real authentication system (PHP)
+- [x] Database connection (MySQL)
 - [ ] Email verification
 - [ ] Password reset functionality
 - [ ] Admin dashboard

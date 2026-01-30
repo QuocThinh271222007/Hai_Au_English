@@ -72,15 +72,71 @@ const initSmoothAnchors = () => {
     });
 };
 
+// FAQ Accordion toggle
+const initFAQAccordion = () => {
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+        
+        if (!question || !answer) return;
+        
+        // Set initial state (collapsed)
+        answer.style.maxHeight = '0';
+        answer.style.overflow = 'hidden';
+        answer.style.transition = 'max-height 0.5s ease, padding 0.5s ease';
+        answer.style.padding = '0 1rem';
+        
+        // Icon transition
+        if (icon) icon.style.transition = 'transform 0.4s ease';
+        
+        question.addEventListener('click', () => {
+            const isOpen = item.classList.contains('active');
+            
+            // Close all other FAQ items
+            faqItems.forEach(otherItem => {
+                if (otherItem !== item) {
+                    otherItem.classList.remove('active');
+                    const otherAnswer = otherItem.querySelector('.faq-answer');
+                    const otherIcon = otherItem.querySelector('.faq-icon');
+                    if (otherAnswer) {
+                        otherAnswer.style.maxHeight = '0';
+                        otherAnswer.style.padding = '0 1rem';
+                    }
+                    if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+            
+            // Toggle current item
+            if (isOpen) {
+                item.classList.remove('active');
+                answer.style.maxHeight = '0';
+                answer.style.padding = '0 1rem';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            } else {
+                item.classList.add('active');
+                answer.style.maxHeight = answer.scrollHeight + 32 + 'px';
+                answer.style.padding = '1rem';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+        });
+    });
+};
+
 // Initialize all animations
 export const initUIAnimations = () => {
     initLazyImages();
     initScrollToTop();
     initSmoothAnchors();
+    initFAQAccordion();
     animateOnScroll();
     window.addEventListener('scroll', animateOnScroll);
     window.addEventListener('load', animateOnScroll);
 };
+
+// Export individual functions
+export { initFAQAccordion, initScrollToTop, initSmoothAnchors, initLazyImages, animateOnScroll };
 
 // Auto initialize on DOM ready
 document.addEventListener('DOMContentLoaded', initUIAnimations);

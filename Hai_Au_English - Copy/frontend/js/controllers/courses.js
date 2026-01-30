@@ -1,29 +1,53 @@
-// Courses page logic: filtering and FAQ toggles
+// courses.js - Xử lý hiển thị và quản lý khóa học với backend PHP
+import courseService from '../services/courseService.js';
+
 document.addEventListener('DOMContentLoaded', function() {
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    const courseCards = document.querySelectorAll('.course-card');
+  const courseList = document.getElementById('course-list');
+  const addForm = document.getElementById('add-course-form');
 
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            filterTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            const filter = this.getAttribute('data-filter');
-            courseCards.forEach(card => {
-                if (filter === 'all') { card.classList.remove('hide'); card.classList.add('show'); }
-                else { const category = card.getAttribute('data-category'); if (category === filter) { card.classList.remove('hide'); card.classList.add('show'); } else { card.classList.add('hide'); card.classList.remove('show'); } }
-            });
-        });
-    });
+  async function loadCourses() {
+    if (!courseList) return;
+    try {
+      const courses = await courseService.getAllCourses();
+      courseList.innerHTML = courses.map(c => `<li>${c.name} - <button data-id="${c.id}" class="delete-btn">Xóa</button></li>`).join('');
+    } catch (err) {
+      courseList.innerHTML = `<li>${err.message}</li>`;
+    }
+  }
 
-    // FAQ functionality
-    const faqItems = document.querySelectorAll('.faq-item');
-    faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
-        question?.addEventListener('click', function() {
-            faqItems.forEach(otherItem => { if (otherItem !== item) otherItem.classList.remove('active'); });
-            item.classList.toggle('active');
-        });
+  if (addForm) {
+    addForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = addForm.name.value;
+      const description = addForm.description.value;
+      try {
+        await courseService.addCourse({ name, description });
+        addForm.reset();
+        loadCourses();
+      } catch (err) {
+        alert(err.message);
+      }
     });
+  }
+
+  if (courseList) {
+    courseList.addEventListener('click', async function(e) {
+      if (e.target.classList.contains('delete-btn')) {
+        const id = e.target.getAttribute('data-id');
+        if (confirm('Xóa khóa học này?')) {
+          try {
+            await courseService.deleteCourse(id);
+            loadCourses();
+          } catch (err) {
+            alert(err.message);
+          }
+        }
+      }
+    });
+    loadCourses();
+  }
 });
+
+export default null;
 
 

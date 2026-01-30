@@ -1,69 +1,26 @@
-// Frontend Auth Service - Xử lý tất cả yêu cầu authentication
-
-import APIClient from './api.js';
+// authService.js - Giao tiếp với backend PHP cho đăng ký/đăng nhập
+const API_BASE = '/hai_au_english/backend/php/auth.php';
 
 export const authService = {
-  // Đăng ký
-  async register(fullName, email, password, confirmPassword) {
-    try {
-      const response = await APIClient.post('/auth/register', {
-        fullName,
-        email,
-        password,
-        confirmPassword
-      });
-      
-      if (response.token) {
-        APIClient.setToken(response.token);
-      }
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  async register({ fullname, email, password }) {
+    const res = await fetch(`${API_BASE}?action=register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullname, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi đăng ký');
+    return data;
   },
-
-  // Đăng nhập
-  async login(email, password, rememberMe = false) {
-    try {
-      const response = await APIClient.post('/auth/login', {
-        email,
-        password
-      });
-      
-      if (response.token) {
-        APIClient.setToken(response.token);
-        if (rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-        }
-      }
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Đăng xuất
-  async logout() {
-    try {
-      await APIClient.post('/auth/logout', {});
-      APIClient.clearToken();
-      localStorage.removeItem('rememberMe');
-      return { message: 'Đăng xuất thành công' };
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Kiểm tra đã đăng nhập
-  isLoggedIn() {
-    return !!localStorage.getItem('token');
-  },
-
-  // Lấy token
-  getToken() {
-    return localStorage.getItem('token');
+  async login({ email, password }) {
+    const res = await fetch(`${API_BASE}?action=login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập');
+    return data;
   }
 };
 
