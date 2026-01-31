@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hải Âu English</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/pages/profile.css">
+</head>
+<body class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm z-50">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="inline-block">
+                        <img src="../assets/images/logo.png" alt="logo" class="h-20 object-contain hover:opacity-80 transition-opacity">
+                    </a>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-xl font-bold text-blue-600">Admin Dashboard</h1>
+
+                <!-- User Info -->
+                <div class="flex items-center gap-4">
+                    <span id="header-username" class="text-gray-700 font-medium hidden md:block">Admin</span>
+                    <button id="logout-btn" class="text-red-600 hover:text-red-700 font-medium transition-colors">
+                        Đăng xuất
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="profile-sidebar" id="sidebar" style="background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%);">
+        <!-- Admin Info -->
+        <div class="sidebar-user-info">
+            <div class="sidebar-avatar-container">
+                <svg class="sidebar-avatar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+            </div>
+            <h3 id="sidebar-name" class="sidebar-username">Admin</h3>
+            <p class="sidebar-role">Quản trị viên</p>
+        </div>
+
+        <!-- Menu -->
+        <nav class="sidebar-menu">
+            <p class="sidebar-section-title">Tổng quan</p>
+            
+            <div class="sidebar-menu-item active" data-section="dashboard">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                </svg>
+                <span>Dashboard</span>
+            </div>
+
+            <p class="sidebar-section-title">Quản lý</p>
+
+            <div class="sidebar-menu-item" data-section="users">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <span>Quản lý học viên</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="enrollments">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span>Đăng ký khóa học</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="courses">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span>Quản lý khóa học</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="teachers">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                </svg>
+                <span>Quản lý giảng viên</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="scores">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Quản lý điểm số</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="feedback">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                <span>Nhận xét học viên</span>
+            </div>
+
+            <div class="sidebar-menu-item" data-section="schedule">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Thời khóa biểu</span>
+            </div>
+
+            <p class="sidebar-section-title">Hệ thống</p>
+
+            <div class="sidebar-menu-item" data-section="trash">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <span>Thùng rác</span>
+                <span id="trash-badge" class="trash-badge hidden">0</span>
+            </div>
+
+            <p class="sidebar-section-title">Cài đặt</p>
+
+            <div class="sidebar-menu-item" data-section="settings">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Cài đặt hệ thống</span>
+            </div>
+        </nav>
+
+        <!-- Logout -->
+        <button class="sidebar-logout" id="sidebar-logout">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>Đăng xuất</span>
+        </button>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    <!-- Main Content -->
+    <main class="profile-content pt-16">
+        <!-- Dashboard Section -->
+        <section id="section-dashboard" class="content-section active">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Thống kê tổng quan</h2>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-card-value" id="stat-users">0</div>
+                        <div class="stat-card-label">Tổng học viên</div>
+                    </div>
+                    
+                    <div class="stat-card green">
+                        <div class="stat-card-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="stat-card-value" id="stat-enrollments">0</div>
+                        <div class="stat-card-label">Đăng ký đang học</div>
+                    </div>
+                    
+                    <div class="stat-card purple">
+                        <div class="stat-card-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                        </div>
+                        <div class="stat-card-value" id="stat-courses">0</div>
+                        <div class="stat-card-label">Khóa học</div>
+                    </div>
+                    
+                    <div class="stat-card orange">
+                        <div class="stat-card-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-card-value" id="stat-teachers">0</div>
+                        <div class="stat-card-label">Giảng viên</div>
+                    </div>
+                </div>
+
+                <!-- Recent Enrollments -->
+                <div class="profile-card-header" style="margin-top: 24px; border-top: 1px solid #e5e7eb; padding-top: 24px;">
+                    <h3 class="profile-card-title text-lg">Đăng ký gần đây</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Học viên</th>
+                                <th>Email</th>
+                                <th>Khóa học</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày đăng ký</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-enrollments-tbody">
+                            <tr>
+                                <td colspan="5" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="section-users" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Quản lý học viên</h2>
+                    <button id="add-user-btn" class="admin-action-btn primary">+ Thêm học viên</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Số điện thoại</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Enrollments Section -->
+        <section id="section-enrollments" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Quản lý đăng ký khóa học</h2>
+                    <button id="add-enrollment-btn" class="admin-action-btn primary">+ Thêm đăng ký</button>
+                </div>
+                <div class="mb-4">
+                    <select id="enrollment-status-filter" class="profile-form-input" style="max-width: 200px;">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="active">Đang học</option>
+                        <option value="completed">Hoàn thành</option>
+                        <option value="cancelled">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Học viên</th>
+                                <th>Khóa học</th>
+                                <th>Năm học</th>
+                                <th>Học kỳ</th>
+                                <th>Tiến độ</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enrollments-tbody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Section -->
+        <section id="section-courses" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Quản lý khóa học</h2>
+                    <button id="add-course-btn" class="admin-action-btn primary">+ Thêm khóa học</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Tên khóa học</th>
+                                <th>Cấp độ</th>
+                                <th>Thời lượng</th>
+                                <th>Học phí</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-tbody">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teachers Section -->
+        <section id="section-teachers" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Quản lý giảng viên</h2>
+                    <button id="add-teacher-btn" class="admin-action-btn primary">+ Thêm giảng viên</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Chuyên môn</th>
+                                <th>Kinh nghiệm</th>
+                                <th>IELTS</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachers-tbody">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scores Section -->
+        <section id="section-scores" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Quản lý điểm số</h2>
+                    <button id="add-score-btn" class="admin-action-btn primary">+ Thêm điểm</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Học viên</th>
+                                <th>Ngày thi</th>
+                                <th>Listening</th>
+                                <th>Reading</th>
+                                <th>Writing</th>
+                                <th>Speaking</th>
+                                <th>Overall</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scores-tbody">
+                            <tr>
+                                <td colspan="8" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section id="section-feedback" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Nhận xét học viên</h2>
+                    <button id="add-feedback-btn" class="admin-action-btn primary">+ Thêm nhận xét</button>
+                </div>
+                <div id="admin-feedback-container">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Section (Thời khóa biểu) -->
+        <section id="section-schedule" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header flex flex-wrap items-center justify-between gap-4">
+                    <h2 class="profile-card-title flex items-center gap-2">
+                        <span class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                        Quản lý thời khóa biểu
+                    </h2>
+                    <button id="add-schedule-btn" class="admin-action-btn primary">+ Thêm lịch học</button>
+                </div>
+                
+                <!-- Schedule Filters -->
+                <div class="schedule-filters bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <!-- Năm học -->
+                        <div class="filter-group">
+                            <label class="text-xs text-gray-500 block mb-1">Năm học</label>
+                            <select id="admin-schedule-year" class="schedule-filter-select">
+                                <option value="">Tất cả</option>
+                                <option value="2025-2026" selected>2025-2026</option>
+                                <option value="2024-2025">2024-2025</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Học kỳ -->
+                        <div class="filter-group">
+                            <label class="text-xs text-gray-500 block mb-1">Học kỳ</label>
+                            <select id="admin-schedule-semester" class="schedule-filter-select">
+                                <option value="">Tất cả</option>
+                                <option value="1">Học kỳ 1</option>
+                                <option value="2" selected>Học kỳ 2</option>
+                                <option value="3">Học kỳ 3</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Ngày -->
+                        <div class="filter-group">
+                            <label class="text-xs text-gray-500 block mb-1">Ngày</label>
+                            <select id="admin-schedule-day" class="schedule-filter-select">
+                                <option value="">Tất cả các ngày</option>
+                                <option value="monday">Thứ Hai</option>
+                                <option value="tuesday">Thứ Ba</option>
+                                <option value="wednesday">Thứ Tư</option>
+                                <option value="thursday">Thứ Năm</option>
+                                <option value="friday">Thứ Sáu</option>
+                                <option value="saturday">Thứ Bảy</option>
+                                <option value="sunday">Chủ Nhật</option>
+                            </select>
+                        </div>
+
+                        <!-- Tuần -->
+                        <div class="filter-group flex-1 min-w-[200px]">
+                            <label class="text-xs text-gray-500 block mb-1">Tuần</label>
+                            <select id="admin-schedule-week" class="schedule-filter-select w-full">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        
+                        <!-- Navigation Buttons -->
+                        <div class="flex items-end gap-2">
+                            <button id="admin-schedule-prev-week" class="schedule-nav-btn" title="Tuần trước">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <button id="admin-schedule-current-week" class="schedule-nav-btn primary" title="Tuần hiện tại">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                </svg>
+                                Hiện tại
+                            </button>
+                            <button id="admin-schedule-next-week" class="schedule-nav-btn" title="Tuần sau">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timetable Grid -->
+                <div class="schedule-timetable-wrapper overflow-x-auto">
+                    <table class="schedule-timetable" id="admin-schedule-timetable">
+                        <thead>
+                            <tr>
+                                <th class="period-col">Tiết</th>
+                                <th class="day-col" data-day="monday">
+                                    <div class="day-name">Thứ 2</div>
+                                    <div class="day-date" id="admin-date-monday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="tuesday">
+                                    <div class="day-name">Thứ 3</div>
+                                    <div class="day-date" id="admin-date-tuesday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="wednesday">
+                                    <div class="day-name">Thứ 4</div>
+                                    <div class="day-date" id="admin-date-wednesday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="thursday">
+                                    <div class="day-name">Thứ 5</div>
+                                    <div class="day-date" id="admin-date-thursday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="friday">
+                                    <div class="day-name">Thứ 6</div>
+                                    <div class="day-date" id="admin-date-friday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="saturday">
+                                    <div class="day-name">Thứ 7</div>
+                                    <div class="day-date" id="admin-date-saturday">--/--/----</div>
+                                </th>
+                                <th class="day-col" data-day="sunday">
+                                    <div class="day-name">CN</div>
+                                    <div class="day-date" id="admin-date-sunday">--/--/----</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-schedule-tbody">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Schedule List Table -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">Danh sách lịch học</h3>
+                    <div class="overflow-x-auto">
+                        <table class="profile-table" id="schedule-list-table">
+                            <thead>
+                                <tr>
+                                    <th>Học viên</th>
+                                    <th>Khóa học</th>
+                                    <th>Nội dung</th>
+                                    <th>Ngày</th>
+                                    <th>Giờ</th>
+                                    <th>Phòng</th>
+                                    <th>Giảng viên</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-list-tbody">
+                                <tr><td colspan="8" class="text-center py-8"><div class="spinner"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Legend -->
+                <div class="schedule-legend mt-4 flex flex-wrap gap-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded" style="background: #1e40af"></span>
+                        <span>Offline</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-4 h-4 rounded" style="background: #059669"></span>
+                        <span>Online</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="section-settings" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Cài đặt hệ thống</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Email nhận liên hệ</label>
+                        <input type="email" id="contact-email" class="profile-form-input" value="contact@haiauenglish.edu.vn">
+                    </div>
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Số điện thoại hotline</label>
+                        <input type="tel" id="hotline" class="profile-form-input" value="0123 456 789">
+                    </div>
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Địa chỉ trung tâm</label>
+                        <input type="text" id="address" class="profile-form-input" value="123 Nguyễn Văn A, Quận 1, TP.HCM">
+                    </div>
+                    <div class="profile-form-group">
+                        <label class="profile-form-label">Năm học hiện tại</label>
+                        <input type="text" id="academic-year" class="profile-form-input" value="2024-2025">
+                    </div>
+                </div>
+                <button class="admin-action-btn primary mt-4">Lưu cài đặt</button>
+            </div>
+        </section>
+
+        <!-- Trash Section (Thùng rác) -->
+        <section id="section-trash" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Thùng rác</h2>
+                    <div class="flex gap-2">
+                        <select id="trash-filter" class="profile-form-input" style="max-width: 200px;">
+                            <option value="">Tất cả bảng</option>
+                            <option value="users">Học viên</option>
+                            <option value="courses">Khóa học</option>
+                            <option value="enrollments">Đăng ký</option>
+                            <option value="teachers">Giảng viên</option>
+                            <option value="scores">Điểm số</option>
+                            <option value="feedback">Nhận xét</option>
+                        </select>
+                        <button id="empty-trash-btn" class="admin-action-btn danger">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Dọn sạch thùng rác
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="alert-info mb-4" style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 8px;">
+                    <p class="text-sm text-yellow-800">
+                        <strong>⚠️ Lưu ý:</strong> Dữ liệu trong thùng rác sẽ tự động bị xóa vĩnh viễn sau <strong>3 tháng</strong> kể từ ngày xóa.
+                    </p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th>Loại</th>
+                                <th>Dữ liệu</th>
+                                <th>Người xóa</th>
+                                <th>Ngày xóa</th>
+                                <th>Hết hạn</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trash-tbody">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+
+    <script type="module" src="../js/controllers/admin.js"></script>
+</body>
+</html>
