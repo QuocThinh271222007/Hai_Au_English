@@ -1,0 +1,636 @@
+/* Custom Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Transitions */
+a, button {
+    transition: all 0.3s ease;
+}
+
+/* Form focus styles */
+input:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+}
+
+/* Active nav link */
+.nav-active {
+    color: #2563eb;
+    border-bottom: 2px solid #2563eb;
+}
+
+/* Mobile menu animation */
+#mobile-menu {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.gap-8 {
+  gap: 3rem !important;
+}
+
+/* Scroll to top button animation */
+#scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Card hover effects */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #2563eb;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Form validation styles */
+.error-input {
+    border-color: #ef4444 !important;
+}
+
+.success-input {
+    border-color: #10b981 !important;
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    animation: slideInRight 0.3s ease-out;
+    max-width: 400px;
+}
+
+.toast.success {
+    border-left: 4px solid #10b981;
+}
+
+.toast.error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast.info {
+    border-left: 4px solid #3b82f6;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .text-responsive {
+        font-size: 14px;
+    }
+}
+
+/* Print styles */
+@media print {
+    header, footer, #scroll-to-top, #mobile-menu-btn {
+        display: none !important;
+    }
+}
+
+header {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+.logo_img_index {
+    width: auto;
+    height: 125px;
+    max-width: 200px;
+}
+
+.logo_img_login_signup {
+    width: 170px;
+    height: 160px;
+}
+
+/* Footer Styling */
+footer {
+    background-color: rgb(219, 235, 255) !important;
+    color: black !important;
+}
+
+footer h3, footer h4 {
+    color: black !important;
+}
+
+footer a {
+    color: black !important;
+}
+
+footer a:hover {
+    color: #2563eb !important;
+}
+
+/* Footer Social Icons - Official Brand Colors */
+footer .flex.gap-3 a:nth-child(1) {
+    background-color: #1877F2 !important; /* Facebook Blue */
+    color: white !important;
+}
+
+footer .flex.gap-3 a.zalo-icon {
+    background-color: transparent !important; /* Transparent để hiện logo Zalo */
+    padding: 0 !important;
+}
+footer .flex.gap-3 a.fb-icon {
+    background-color: white !important; 
+    padding: 0 !important;
+}
+footer .flex.gap-3 a.fb-icon img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px;
+}
+footer .flex.gap-3 a.zalo-icon img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px;
+}
+
+footer .flex.gap-3 a.phone-icon {
+    background-color: #25D366 !important; /* Phone Green */
+    color: white !important;
+}
+
+footer .flex.gap-3 a:hover {
+    opacity: 0.8 !important;
+    transform: scale(1.1);
+}
+
+/* Mobile Header Styles */
+@media (max-width: 767px) {
+    /* Logo nhỏ hơn trên mobile */
+    .logo_img_index {
+        height: 100px !important;
+        width: auto;
+    }
+    
+    /* Justify between trên mobile */
+    .header-container {
+        justify-content: space-between !important;
+    }
+    
+    /* Khung 1000+ học viên nhỏ hơn trên mobile */
+    .stats-box {
+        padding: 12px !important;;
+        left: -12px !important;
+    }
+    
+    .stats-box .stats-icon {
+        padding: 8px !important;
+    }
+    
+    .stats-box .stats-icon svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    
+    .stats-box .stats-number {
+        font-size: 18px !important;
+    }
+    
+    .stats-box .stats-label {
+        font-size: 12px !important;
+    }
+}
+
+/* Nhóm bên phải trên mobile (nút đăng ký + hamburger) */
+.mobile-right-group {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .mobile-right-group {
+        display: flex !important;
+    }
+}
+
+/* Nút đăng ký học trên mobile */
+.mobile-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+}
+
+.mobile-cta-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* ==================== FLOATING CONTACT SIDEBAR ==================== */
+.floating-contact {
+    position: fixed;
+    right: 16px;
+    bottom: 100px;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    /* Ẩn các nút con trên desktop khi chưa active */
+}
+
+.floating-contact .floating-contact-btn:not(.main):not(.up) {
+    display: none;
+}
+
+.floating-contact.active .floating-contact-btn {
+    display: flex;
+}
+
+.floating-contact .floating-contact-btn.main {
+    display: flex;
+}
+
+/* Mobile: luôn hiển thị các nút khi active, ẩn khi chưa active */
+@media (max-width: 767px) {
+    .floating-contact .floating-contact-btn:not(.main):not(.up) {
+        display: none;
+    }
+    .floating-contact.active .floating-contact-btn {
+        display: flex;
+    }
+    .floating-contact .floating-contact-btn.main {
+        display: flex;
+    }
+}
+
+.floating-contact-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.floating-contact-icons.collapsed {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.floating-contact-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.floating-contact-icons a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Phone icon */
+.floating-contact-icons .fc-phone {
+    background: rgb(38, 212, 102);
+    color: white;
+}
+
+/* Zalo icon */
+.floating-contact-icons .fc-zalo {
+    background: white;
+    padding: 0;
+    overflow: hidden;
+}
+
+.floating-contact-icons .fc-zalo img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Toggle button - chỉ hiện trên mobile */
+.floating-toggle-btn {
+    display: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgb(13, 214, 87);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(13, 214, 87, 0.4);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.floating-toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+.floating-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    transition: opacity 0.3s ease;
+}
+
+/* Icon mặc định (chat) */
+.floating-toggle-btn .icon-chat {
+    display: block;
+}
+
+.floating-toggle-btn .icon-close {
+    display: none;
+}
+
+/* Khi active: đổi màu đỏ và hiện icon X */
+.floating-toggle-btn.active {
+    background: #ef4444;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.floating-toggle-btn.active .icon-chat {
+    display: none;
+}
+
+.floating-toggle-btn.active .icon-close {
+    display: block;
+}
+
+/* Mobile: hiện nút toggle */
+@media (max-width: 767px) {
+    .floating-contact {
+        right: 32px;
+        bottom: 100px;
+    }
+    
+    .floating-toggle-btn {
+        display: flex;
+    }
+    
+    .floating-contact-icons {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        pointer-events: none;
+    }
+    
+    .floating-contact-icons.expanded {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
+
+/* Scroll to top button - đặt cùng vị trí right với floating contact */
+#scroll-to-top {
+    right: 32px !important;
+    bottom: 32px !important;
+}
+
+
+@media (min-width: 768px) {
+    .floating-contact {
+        right: 32px;
+        bottom: 100px;
+    }
+    
+    .floating-toggle-btn {
+        display: flex;
+    }
+    
+    .floating-contact-icons {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        pointer-events: none;
+    }
+    
+    .floating-contact-icons.expanded {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+}
+
+/* Feature Cards - Icon ngoài card */
+.feature-card {
+    position: relative;
+    padding-top: 2.5rem;
+    margin-top: 1.5rem;
+    box-shadow: 0px 4px 4px 0px rgba(196, 196, 196, 0.8);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    transform: translateY(-3px);
+}
+
+.feature-icon-wrapper {
+    position: absolute;
+    top: -2.5rem;
+    left: 1.5rem;
+    z-index: 10;
+}
+
+.feature-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 4px 0px rgba(196, 196, 196, 0.8);
+}
+
+.feature-icon svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Mobile feature cards */
+@media (max-width: 767px) {
+    .feature-card {
+        padding: 1.5rem;
+        padding-top: 2.5rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-icon-wrapper {
+        top: -2.5rem;
+        left: 1rem;
+    }
+    
+    .feature-icon {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .feature-icon svg {
+        width: 2rem;
+        height: 2rem;
+    }
+    .gap_seclection_courses {
+        gap: 10px !important;
+    }
+}
+.background_phone{
+    background-color: rgb(38, 212, 102);
+}
+/* .background_phone:hover{
+    background-color: rgb(49, 176, 96);
+} */
+.zalo_icon_contact{
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+}
+.fb_icon_contact{
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+}
+.index_feature_section{
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+.feature_grid_section{
+    gap: 5rem;
+}
+.gradient_line {
+    height: 4px; 
+    width: 255px; 
+    margin: 1.5rem auto auto; 
+    border-radius: 2px; 
+    background: linear-gradient(90deg, #ff9800 0%, #ff3d00 100%);
+}
+.bg-white\/95 {
+    background-color: rgba(255, 255, 255) !important;
+}
+
+/* Content Management Tabs */
+.content-tab-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.content-tab-btn:hover {
+    color: #374151;
+    background-color: #e5e7eb;
+}
+
+.content-tab-btn.active {
+    color: #ffffff;
+    background-color: #f97316;
+    border-color: #f97316;
+}
+
+.content-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.content-input:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}

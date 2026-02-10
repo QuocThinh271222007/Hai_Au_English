@@ -1,0 +1,102 @@
+# Hải Âu English - Apache Configuration
+# ================================================
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# RewriteBase - Comment/uncomment based on environment:
+# For XAMPP (localhost/hai_au_english):
+# RewriteBase /hai_au_english/
+# For Production (root domain): comment line above, uncomment line below
+RewriteBase /
+
+# =============================================
+# CLEAN URLs - URL ĐẸP TIẾNG VIỆT
+# =============================================
+
+# Trang chủ
+RewriteRule ^$                      frontend/pages/index.php [L]
+RewriteRule ^TrangChu$              frontend/pages/index.php [L]
+RewriteRule ^trangchu$              frontend/pages/index.php [L]
+
+# Giới thiệu
+RewriteRule ^GioiThieu$             frontend/pages/about.php [L]
+RewriteRule ^gioithieu$             frontend/pages/about.php [L]
+
+# Khóa học
+RewriteRule ^KhoaHoc$               frontend/pages/courses.php [L]
+RewriteRule ^khoahoc$               frontend/pages/courses.php [L]
+
+# Giảng viên
+RewriteRule ^GiangVien$             frontend/pages/teachers.php [L]
+RewriteRule ^giangvien$             frontend/pages/teachers.php [L]
+
+# Liên hệ
+RewriteRule ^LienHe$                frontend/pages/contact.php [L]
+RewriteRule ^lienhe$                frontend/pages/contact.php [L]
+
+# Đăng nhập
+RewriteRule ^DangNhap$              frontend/pages/login.php [L]
+RewriteRule ^dangnhap$              frontend/pages/login.php [L]
+
+# Đăng ký
+RewriteRule ^DangKy$                frontend/pages/signup.php [L]
+RewriteRule ^dangky$                frontend/pages/signup.php [L]
+
+# Trang học viên (profile)
+RewriteRule ^HocVien$               frontend/users/profile.php [L]
+RewriteRule ^hocvien$               frontend/users/profile.php [L]
+
+# Trang quản trị (admin)
+RewriteRule ^QuanTri$               frontend/admin/admin.php [L]
+RewriteRule ^quantri$               frontend/admin/admin.php [L]
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "(^#.*#|\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect backend files from direct access
+<FilesMatch "^(db|session_config)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Enable GZIP compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/json
+    AddOutputFilterByType DEFLATE application/javascript text/javascript
+    AddOutputFilterByType DEFLATE text/xml application/xml
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Set default charset
+AddDefaultCharset UTF-8

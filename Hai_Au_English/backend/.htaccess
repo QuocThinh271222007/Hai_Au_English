@@ -1,0 +1,29 @@
+# Backend .htaccess - Protect sensitive files
+
+# Disable directory listing
+Options -Indexes
+
+# Block access to sensitive PHP files
+<FilesMatch "^(db|session_config)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to SQL files
+<FilesMatch "\.sql$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Allow only specific PHP endpoints
+<FilesMatch "^(auth|courses|teachers|contact|profile|admin|users|test_schedule)\.php$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Set proper headers for PHP files
+<IfModule mod_headers.c>
+    <FilesMatch "\.php$">
+        Header set Access-Control-Allow-Credentials "true"
+    </FilesMatch>
+</IfModule>

@@ -1,0 +1,1547 @@
+/**
+ * Reviews & Achievements Styles
+ * Carousel with auto-slide functionality
+ */
+
+/* ============================================
+   ACHIEVEMENTS SECTION
+   ============================================ */
+#achievements-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 767px) {
+    #achievements-section {
+        padding: 40px 0;
+    }
+}
+
+#achievements-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.achievements-header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+}
+
+.achievements-header h2 {
+    color: white;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 767px) {
+    .achievements-header {
+        margin-bottom: 24px;
+    }
+    .achievements-header h2 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+}
+
+.achievements-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+    .achievements-header p {
+        font-size: 0.85rem;
+        padding: 0 16px;
+    }
+}
+
+.achievements-container {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 60px;
+}
+
+@media (max-width: 767px) {
+    .achievements-container {
+        padding: 0 12px;
+        overflow: hidden;
+    }
+}
+
+@media (max-width: 767px) {
+    #achievements-carousel {
+        border-radius: 12px;
+        margin: 0;
+    }
+}
+
+.achievements-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    align-items: stretch;
+}
+
+@media (max-width: 767px) {
+    .achievements-track {
+        gap: 0;
+    }
+    
+    .achievement-card {
+        padding: 0;
+        flex: 0 0 100%;
+    }
+    
+    .achievement-card-inner {
+        border-radius: 12px;
+        margin: 0 8px;
+    }
+}
+
+.achievement-card {
+    flex: 0 0 25%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: flex;
+    padding: 8px;
+}
+
+@media (max-width: 1199px) {
+    .achievement-card {
+        flex: 0 0 33.333%;
+    }
+}
+
+@media (max-width: 991px) {
+    .achievement-card {
+        flex: 0 0 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    .achievement-card {
+        flex: 0 0 100%;
+    }
+}
+
+.achievement-card-inner {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    cursor: pointer;
+}
+
+.achievement-card > div,
+.achievement-card > div:first-child {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .achievement-card > div,
+    .achievement-card {
+        border-radius: 12px;
+    }
+}
+
+.achievement-card:hover .achievement-card-inner {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.achievement-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.achievement-image {
+    position: relative;
+    padding-top: 100%; /* Tỷ lệ 1:1 vuông cho ảnh */
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecf7 100%);
+}
+
+@media (max-width: 1023px) {
+    .achievement-image {
+        padding-top: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .achievement-image {
+        padding-top: 100%;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-image {
+        padding-top: 100%;
+    }
+}
+
+.achievement-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    transition: transform 0.3s ease;
+}
+
+.achievement-card:hover .achievement-image img {
+    transform: scale(1.08);
+}
+
+.achievement-score {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    z-index: 2;
+}
+
+@media (max-width: 767px) {
+    .achievement-score {
+        padding: 4px 10px;
+        font-size: 0.8rem;
+        top: 8px;
+        left: 8px;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-score {
+        padding: 6px 14px;
+        font-size: 0.9rem;
+        top: 12px;
+        left: 12px;
+    }
+}
+
+.achievement-content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+@media (max-width: 767px) {
+    .achievement-content {
+        padding: 12px;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-content {
+        padding: 16px;
+        gap: 8px;
+    }
+}
+
+.achievement-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@media (max-width: 767px) {
+    .achievement-name {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-name {
+        font-size: 1.1rem;
+    }
+}
+
+.achievement-title {
+    color: #059669;
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 767px) {
+    .achievement-title {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-title {
+        font-size: 0.95rem;
+    }
+}
+
+.achievement-course {
+    display: inline-block;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    color: #4338ca;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+@media (max-width: 767px) {
+    .achievement-course {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+}
+
+@media (max-width: 479px) {
+    .achievement-course {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+    }
+}
+
+.achievement-desc {
+    display: none; /* Ẩn mô tả để đồng bộ chiều cao */
+}
+
+/* ============================================
+   LIGHTBOX - Full screen image viewer
+   ============================================ */
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.lightbox-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.lightbox-overlay.active .lightbox-content {
+    transform: scale(1);
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-info {
+    text-align: center;
+    margin-top: 20px;
+    color: white;
+}
+
+.lightbox-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.lightbox-title {
+    font-size: 1.1rem;
+    color: #a5b4fc;
+    margin-bottom: 8px;
+}
+
+.lightbox-score {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-prev {
+    left: -80px;
+}
+
+.lightbox-next {
+    right: -80px;
+}
+
+@media (max-width: 767px) {
+    .lightbox-prev {
+        left: -60px;
+    }
+    .lightbox-next {
+        right: -60px;
+    }
+    .lightbox-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    .lightbox-name {
+        font-size: 1.2rem;
+    }
+    .lightbox-title {
+        font-size: 0.95rem;
+    }
+}
+
+/* ============================================
+   REVIEWS SECTION - REDESIGNED
+   ============================================ */
+#reviews-section {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 80px 0;
+}
+
+.reviews-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.reviews-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 16px;
+}
+
+.reviews-header p {
+    color: #64748b;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.reviews-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.reviews-stat-item {
+    text-align: center;
+}
+
+.reviews-stat-item .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.reviews-stat-item .stat-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.reviews-stat-item .stat-stars {
+    color: #fbbf24;
+    font-size: 1.5rem;
+}
+
+.reviews-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+}
+
+@media (max-width: 767px) {
+    .reviews-container {
+        padding: 0 12px;
+        overflow: hidden;
+    }
+    
+    #reviews-carousel {
+        border-radius: 12px;
+    }
+}
+
+.reviews-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    align-items: stretch;
+    gap: 16px;
+}
+
+@media (max-width: 639px) {
+    .reviews-track {
+        gap: 12px;
+    }
+}
+
+.review-card {
+    flex: 0 0 calc(33.333% - 16px);
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+}
+
+@media (max-width: 1023px) {
+    .review-card {
+        flex: 0 0 calc(50% - 8px);
+    }
+}
+
+@media (max-width: 767px) {
+    .review-card {
+        flex: 0 0 100%;
+        width: 100%;
+        margin: 0;
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .reviews-track {
+        gap: 0;
+        padding: 0;
+    }
+    
+    .review-content-wrapper {
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .review-text-area {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .review-image {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+    }
+    
+    .review-image img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+    }
+    
+    .review-header {
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .review-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .review-avatar span {
+        font-size: 1rem;
+    }
+    
+    .review-user-name {
+        font-size: 0.85rem;
+    }
+    
+    .review-date {
+        font-size: 0.7rem;
+    }
+    
+    .review-rating {
+        margin-bottom: 8px;
+    }
+    
+    .review-rating .star {
+        font-size: 0.9rem;
+    }
+    
+    .review-comment {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+    
+    .carousel-track-wrapper {
+        overflow: hidden;
+    }
+}
+
+.review-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+}
+
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.review-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-avatar span {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.review-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.review-user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.review-date {
+    display: flex;
+    justify-content: left;  
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.review-rating {
+    margin-bottom: 10px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 2px;
+    justify-content: left;
+}
+
+.review-rating > div {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 2px;
+}
+
+.review-rating .star {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    display: inline-block !important;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.review-rating .star.filled {
+    color: #fbbf24;
+}
+
+.review-comment {
+    color: #475569;
+    line-height: 1.5;
+    font-size: 0.88rem;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 4.5em;
+    max-height: 4.5em;
+}
+
+/* All text areas are clickable like images */
+.review-text-area.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 6px 8px;
+    margin: -6px -8px;
+    border-radius: 6px;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.review-text-area.clickable:hover {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.review-text-area.clickable:active {
+    background: #f1f5f9;
+    transform: scale(0.98);
+}
+
+@media (max-width: 767px) {
+    .review-comment {
+        -webkit-line-clamp: 2;
+        min-height: 3em;
+        max-height: 3em;
+        font-size: 0.8rem;
+    }
+    
+    .review-text-area.clickable {
+        padding: 6px;
+        margin: -6px;
+    }
+}
+
+/* ============================================
+   REVIEW TEXT MODAL - Full screen reader
+   ============================================ */
+.review-text-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.review-text-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.review-text-modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 24px;
+    position: relative;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.review-text-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.review-text-modal-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.review-text-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-right: 40px;
+}
+
+.review-text-modal-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.review-text-modal-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-text-modal-avatar span {
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.review-text-modal-info {
+    flex: 1;
+}
+
+.review-text-modal-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.review-text-modal-date {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.review-text-modal-rating {
+    display: flex;
+    gap: 2px;
+}
+
+.review-text-modal-rating .star {
+    font-size: 1.1rem;
+    color: #fbbf24;
+}
+
+.review-text-modal-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #334155;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+@media (max-width: 767px) {
+    .review-text-modal {
+        padding: 12px;
+    }
+    
+    .review-text-modal-content {
+        padding: 20px;
+        max-height: 90vh;
+    }
+    
+    .review-text-modal-body {
+        font-size: 1rem;
+        padding: 16px;
+    }
+}
+
+.read-more-btn:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Content wrapper - comment and image side by side */
+.review-content-wrapper {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    align-items: flex-start;
+}
+
+.review-text-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.review-image {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.review-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border-radius: 6px;
+}
+
+.review-image img:hover {
+    transform: scale(1.03);
+}
+
+/* ============================================
+   CAROUSEL CONTROLS
+   ============================================ */
+/* ============================================
+   CAROUSEL NAV BUTTONS - OUTSIDE TRACK
+   ============================================ */
+#achievements-carousel,
+#reviews-carousel,
+#teacher-reviews-carousel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+@media (max-width: 767px) {
+    #achievements-carousel,
+    #reviews-carousel,
+    #teacher-reviews-carousel {
+        gap: 8px;
+    }
+}
+
+.carousel-track-wrapper {
+    padding-top: 10px;
+    flex: 1;
+    overflow: hidden;
+    border-radius: 16px;
+    min-width: 0;
+}
+
+@media (max-width: 767px) {
+    .carousel-track-wrapper {
+        border-radius: 12px;
+    }
+}
+
+.carousel-nav-btn {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+@media (max-width: 767px) {
+    .carousel-nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .carousel-nav-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.carousel-nav-btn:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.carousel-nav-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.carousel-nav-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+#achievements-section .carousel-nav-btn {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+#achievements-section .carousel-nav-btn:hover {
+    background: white;
+    border-color: white;
+    color: #6366f1;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 767px) {
+    #achievements-carousel,
+    #reviews-carousel,
+    #teacher-reviews-carousel {
+        gap: 0px;
+    }
+    
+    .carousel-nav-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .carousel-nav-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-nav-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .carousel-nav-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Old carousel buttons (keep for compatibility) */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.carousel-btn.prev {
+    left: 0;
+}
+
+.carousel-btn.next {
+    right: 0;
+}
+
+.carousel-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0;
+    padding: 0;
+}
+
+.carousel-dot.active {
+    background: #2563eb;
+    width: 28px;
+    border-radius: 10px;
+}
+
+#achievements-section .carousel-dot {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#achievements-section .carousel-dot.active {
+    background: white;
+    width: 28px;
+}
+
+#achievements-section .carousel-btn {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+#achievements-section .carousel-btn:hover {
+    background: white;
+    color: #6366f1;
+}
+
+/* ============================================
+   REVIEW FORM - REDESIGNED
+   ============================================ */
+.review-form-section {
+    max-width: 680px;
+    margin: 60px auto 0;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+}
+
+.review-form-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.star-rating-input {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.star-btn {
+    font-size: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e2e8f0;
+    transition: all 0.2s ease;
+    padding: 4px;
+    line-height: 1;
+}
+
+.star-btn:hover,
+.star-btn.active {
+    color: #fbbf24;
+    transform: scale(1.15);
+}
+
+.review-textarea {
+    width: 100%;
+    min-height: 140px;
+    padding: 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 1rem;
+    resize: vertical;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    background: #f8fafc;
+}
+
+.review-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.review-textarea::placeholder {
+    color: #94a3b8;
+}
+
+.review-image-upload {
+    margin-top: 20px;
+}
+
+.image-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.image-upload-label:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.image-upload-label svg {
+    width: 22px;
+    height: 22px;
+}
+
+#image-preview-container {
+    margin-top: 16px;
+    position: relative;
+    display: inline-block;
+}
+
+#image-preview-container.hidden {
+    display: none !important;
+}
+
+#image-preview {
+    max-width: 220px;
+    max-height: 160px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: 2px solid white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    transition: all 0.2s ease;
+}
+
+.remove-image-btn:hover {
+    transform: scale(1.1);
+    background: #dc2626;
+}
+
+.review-submit-btn {
+    width: 100%;
+    margin-top: 28px;
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.review-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.review-submit-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 16px;
+    border: 1px solid #fcd34d;
+}
+
+.login-prompt p {
+    color: #92400e;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.login-prompt a {
+    display: inline-block;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.login-prompt a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ============================================
+   IMAGE MODAL
+   ============================================ */
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    cursor: pointer;
+}
+
+.image-modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    z-index: 1;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.image-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 768px) {
+    #achievements-section,
+    #reviews-section {
+        padding: 60px 0;
+    }
+    
+    .achievements-header h2,
+    .reviews-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .achievements-container,
+    .reviews-container {
+        padding: 0 40px;
+    }
+    
+    .carousel-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .carousel-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .review-form-section {
+        margin: 40px 16px 0;
+        padding: 24px;
+    }
+    
+    .reviews-stats {
+        gap: 20px;
+    }
+    
+    .reviews-stat-item .stat-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .achievements-container,
+    .reviews-container {
+        padding: 0 50px;
+    }
+    
+    .carousel-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .star-btn {
+        font-size: 1.5rem;
+    }
+}
