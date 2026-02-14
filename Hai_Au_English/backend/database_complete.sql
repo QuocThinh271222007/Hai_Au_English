@@ -14,8 +14,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =============================================
 -- TẠO DATABASE (nếu cần)
 -- =============================================
--- CREATE DATABASE IF NOT EXISTS `hai_au_english` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE `hai_au_english`;
+CREATE DATABASE IF NOT EXISTS `hai_au_english` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `hai_au_english`;
 
 -- =============================================
 -- XÓA TẤT CẢ CÁC BẢNG THEO THỨ TỰ
@@ -144,8 +144,7 @@ CREATE TABLE `classes` (
   INDEX `idx_teacher` (`teacher_id`),
   INDEX `idx_status` (`status`),
   INDEX `idx_academic_year` (`academic_year`),
-  CONSTRAINT `fk_class_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_class_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_class_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================
@@ -746,5 +745,13 @@ UNION ALL SELECT 'teacher_reviews', COUNT(*) FROM teacher_reviews
 UNION ALL SELECT 'course_fee_items', COUNT(*) FROM course_fee_items
 UNION ALL SELECT 'site_content', COUNT(*) FROM site_content
 UNION ALL SELECT 'site_settings', COUNT(*) FROM site_settings;
+
+-- =============================================
+-- THÊM FOREIGN KEY CONSTRAINTS SAU KHI TẠO TẤT CẢ BẢNG
+-- =============================================
+ALTER TABLE `classes` ADD CONSTRAINT `fk_class_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL;
+
+-- Bật lại foreign key check
+SET FOREIGN_KEY_CHECKS = 1;
 
 SELECT '✅ Database đã được tạo thành công!' AS 'Trạng thái';

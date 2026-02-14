@@ -1723,3 +1723,48 @@
         width: 100%;
     }
 }
+/* ==================== ENROLLMENT FILTER BUTTONS ==================== */
+.enroll-filter-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+}
+
+.enroll-filter-btn:hover {
+    background: #e5e7eb;
+}
+
+.enroll-filter-btn.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+/* Available course card */
+.available-course-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.available-course-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Spinner small */
+.spinner-sm {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s ease-in-out infinite;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

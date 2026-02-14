@@ -27,6 +27,7 @@ function jsonResponse($success, $message, $data = null, $code = 200) {
 
 require_once 'config.php';
 require_once 'db.php';
+require_once 'notifications.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
@@ -150,12 +151,32 @@ function createTeacherReview() {
         ]);
         
         $id = $pdo->lastInsertId();
+        
+        // Tạo thông báo cho admin
+        createAdminNotification('teacher_review', 'Đánh giá GV mới', 'Học viên "' . $reviewerName . '" đã gửi đánh giá ' . $data['rating'] . ' sao', $id, 'teacher_reviews');
+        
         jsonResponse(true, 'Đánh giá của bạn đã được gửi thành công!', ['id' => $id]);
         
     } else if ($isAdmin) {
         // Admin creating a review
         if (empty($data['reviewer_name']) || empty($data['comment'])) {
             jsonResponse(false, 'Vui lòng nhập đầy đủ thông tin', null, 400);
+        }
+        
+        $isApproved = $data['is_approved'] ?? 1;
+        
+        // Kiểm tra giới hạn nếu đang tạo với trạng thái duyệt
+        if ($isApproved == 1) {
+            $approvedCount = countApprovedTeacherReviews();
+            $limits = getLimitSettingsExtended();
+            
+            if ($approvedCount >= $limits['max_approved_teacher_reviews']) {
+                jsonResponse(false, 'Đã đạt giới hạn ' . $limits['max_approved_teacher_reviews'] . ' đánh giá giảng viên được duyệt. Vui lòng ẩn hoặc xóa một đánh giá khác trước, hoặc tạo với trạng thái chờ duyệt.', [
+                    'limit_reached' => true,
+                    'current_count' => $approvedCount,
+                    'max_count' => $limits['max_approved_teacher_reviews']
+                ], 400);
+            }
         }
         
         // Get max display order
@@ -175,10 +196,16 @@ function createTeacherReview() {
             $data['comment'],
             $data['teacher_id'] ?? null,
             $maxOrder + 1,
-            $data['is_approved'] ?? 1
+            $isApproved
         ]);
         
         $id = $pdo->lastInsertId();
+        
+        // Tạo thông báo
+        if ($isApproved) {
+            createAdminNotification('teacher_review', 'Đánh giá GV mới', 'Đã thêm đánh giá từ "' . $data['reviewer_name'] . '"', $id, 'teacher_reviews');
+        }
+        
         jsonResponse(true, 'Thêm đánh giá thành công', ['id' => $id]);
         
     } else {
@@ -193,6 +220,30 @@ function updateTeacherReview() {
     
     if (empty($data['id'])) {
         jsonResponse(false, 'Thiếu ID đánh giá', null, 400);
+    }
+    
+    $isApproved = $data['is_approved'] ?? 1;
+    
+    // Kiểm tra giới hạn nếu đang duyệt
+    if ($isApproved == 1) {
+        // Lấy trạng thái hiện tại của review này
+        $stmt = $pdo->prepare("SELECT is_approved FROM teacher_reviews WHERE id = ?");
+        $stmt->execute([$data['id']]);
+        $currentReview = $stmt->fetch();
+        
+        // Chỉ kiểm tra nếu đang chuyển từ chưa duyệt sang duyệt
+        if ($currentReview && $currentReview['is_approved'] == 0) {
+            $approvedCount = countApprovedTeacherReviews();
+            $limits = getLimitSettingsExtended();
+            
+            if ($approvedCount >= $limits['max_approved_teacher_reviews']) {
+                jsonResponse(false, 'Đã đạt giới hạn ' . $limits['max_approved_teacher_reviews'] . ' đánh giá giảng viên được duyệt. Vui lòng ẩn hoặc xóa một đánh giá khác trước.', [
+                    'limit_reached' => true,
+                    'current_count' => $approvedCount,
+                    'max_count' => $limits['max_approved_teacher_reviews']
+                ], 400);
+            }
+        }
     }
     
     $stmt = $pdo->prepare("
@@ -215,9 +266,14 @@ function updateTeacherReview() {
         $data['rating'] ?? 5,
         $data['comment'],
         $data['teacher_id'] ?? null,
-        $data['is_approved'] ?? 1,
+        $isApproved,
         $data['id']
     ]);
+    
+    // Tạo thông báo khi duyệt
+    if ($isApproved) {
+        createAdminNotification('teacher_review', 'Đánh giá GV đã duyệt', 'Đánh giá từ "' . ($data['reviewer_name'] ?? 'Ẩn danh') . '" đã được duyệt', $data['id'], 'teacher_reviews');
+    }
     
     jsonResponse(true, 'Cập nhật đánh giá thành công');
 }
@@ -231,8 +287,16 @@ function deleteTeacherReview() {
         jsonResponse(false, 'Thiếu ID đánh giá', null, 400);
     }
     
+    // Lấy thông tin trước khi xóa
+    $stmt = $pdo->prepare("SELECT reviewer_name FROM teacher_reviews WHERE id = ?");
+    $stmt->execute([$data['id']]);
+    $review = $stmt->fetch();
+    $reviewerName = $review['reviewer_name'] ?? 'Ẩn danh';
+    
     $stmt = $pdo->prepare("DELETE FROM teacher_reviews WHERE id = ?");
     $stmt->execute([$data['id']]);
+    
+    createAdminNotification('teacher_review', 'Xóa đánh giá GV', 'Đánh giá từ "' . $reviewerName . '" đã bị xóa', $data['id'], 'teacher_reviews');
     
     jsonResponse(true, 'Xóa đánh giá thành công');
 }

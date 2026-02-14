@@ -1315,5 +1315,86 @@ export const adminService = {
         } catch (error) {
             return { success: false, error: error.message };
         }
+    },
+
+    // ==================== NOTIFICATIONS ====================
+    async getNotifications(options = {}) {
+        try {
+            const params = new URLSearchParams();
+            if (options.type) params.append('type', options.type);
+            if (options.unread_only) params.append('unread_only', '1');
+            if (options.limit) params.append('limit', options.limit);
+            if (options.page) params.append('page', options.page);
+            
+            const url = `${API_CONFIG.NOTIFICATIONS}${params.toString() ? '?' + params.toString() : ''}`;
+            const response = await fetch(url, {
+                credentials: 'include'
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async markNotificationAsRead(id) {
+        try {
+            const response = await fetch(`${API_CONFIG.NOTIFICATIONS}?id=${id}`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async markAllNotificationsAsRead() {
+        try {
+            const response = await fetch(`${API_CONFIG.NOTIFICATIONS}?action=read_all`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteNotification(id) {
+        try {
+            const response = await fetch(`${API_CONFIG.NOTIFICATIONS}?id=${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    // Lấy settings (bao gồm limits)
+    async getSettings() {
+        try {
+            const response = await fetch(`${getApiUrl()}?action=settings`, {
+                credentials: 'include'
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
+    async updateSettings(settings) {
+        try {
+            const response = await fetch(`${getApiUrl()}?action=update-settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(settings)
+            });
+            return await response.json();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
     }
 };

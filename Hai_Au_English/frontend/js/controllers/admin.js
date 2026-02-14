@@ -537,67 +537,200 @@ async function renderUsers() {
     }
 }
 
-// Render Enrollments
-async function renderEnrollments(status = null) {
-    const tbody = document.getElementById('enrollments-tbody');
+// Render Enrollments - Show courses with enrollment counts
+async function renderEnrollments(courseStatus = '', categoryFilter = '') {
+    const grid = document.getElementById('enrollment-courses-grid');
+    if (!grid) return;
+    
+    const categoryLabels = {
+        tieuhoc: { text: 'Tiểu học', bg: '#dcfce7', color: '#166534' },
+        thcs: { text: 'THCS', bg: '#dbeafe', color: '#1e40af' },
+        ielts: { text: 'IELTS', bg: '#f3e8ff', color: '#7c3aed' }
+    };
+    
     try {
-        const result = await adminService.getEnrollments(status);
-        if (!result.success || !result.enrollments?.length) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500">Không có dữ liệu</td></tr>';
+        // Get courses and enrollments
+        const [coursesResult, enrollmentsResult] = await Promise.all([
+            adminService.getCourses(),
+            adminService.getEnrollments()
+        ]);
+        
+        if (!coursesResult.success || !coursesResult.courses?.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">Không có khóa học nào</div>';
             return;
         }
-
-        tbody.innerHTML = result.enrollments.map(e => `
-            <tr>
-                <td>${e.fullname}</td>
-                <td>${e.course_name}</td>
-                <td>${e.academic_year || '-'}</td>
-                <td>${e.semester || '-'}</td>
-                <td>
-                    <div class="flex items-center gap-2">
-                        <div class="progress-bar-container flex-1" style="height: 8px; background: #e5e7eb; border-radius: 4px;">
-                            <div class="progress-bar-fill" style="width: ${e.progress || 0}%; height: 100%; background: #10b981; border-radius: 4px;"></div>
-                        </div>
-                        <span class="text-sm">${e.progress || 0}%</span>
+        
+        // Count enrollments per course
+        const enrollmentCounts = {};
+        if (enrollmentsResult.success && enrollmentsResult.enrollments) {
+            enrollmentsResult.enrollments.forEach(e => {
+                if (!enrollmentCounts[e.course_id]) {
+                    enrollmentCounts[e.course_id] = { total: 0, active: 0, pending: 0 };
+                }
+                enrollmentCounts[e.course_id].total++;
+                if (e.status === 'active') enrollmentCounts[e.course_id].active++;
+                if (e.status === 'pending') enrollmentCounts[e.course_id].pending++;
+            });
+        }
+        
+        // Filter courses
+        let filteredCourses = coursesResult.courses;
+        
+        if (courseStatus === 'open') {
+            filteredCourses = filteredCourses.filter(c => c.is_active === 1 || c.is_active === '1');
+        } else if (courseStatus === 'closed') {
+            filteredCourses = filteredCourses.filter(c => c.is_active === 0 || c.is_active === '0');
+        }
+        
+        if (categoryFilter) {
+            filteredCourses = filteredCourses.filter(c => c.age_group === categoryFilter);
+        }
+        
+        if (!filteredCourses.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">Không tìm thấy khóa học phù hợp</div>';
+            return;
+        }
+        
+        grid.innerHTML = filteredCourses.map(course => {
+            const counts = enrollmentCounts[course.id] || { total: 0, active: 0, pending: 0 };
+            const categoryStyle = categoryLabels[course.age_group] || { text: course.age_group, bg: '#f3f4f6', color: '#374151' };
+            const defaultImg = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=250&fit=crop';
+            const imgUrl = course.image_url ? (course.image_url.startsWith('http') ? course.image_url : BASE_PATH + course.image_url) : defaultImg;
+            
+            return `
+                <div class="enrollment-course-card bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                     data-course-id="${course.id}" data-course='${JSON.stringify(course).replace(/'/g, "&#39;")}'>
+                    <div class="relative">
+                        <img src="${imgUrl}" alt="${course.name}" 
+                             class="w-full h-32 object-cover"
+                             onerror="this.src='${defaultImg}'">
+                        <span class="absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded"
+                              style="background: ${categoryStyle.bg}; color: ${categoryStyle.color}">
+                            ${categoryStyle.text}
+                        </span>
+                        ${course.is_active ? '' : '<span class="absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-600">Đã đóng</span>'}
                     </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">${course.name}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${course.curriculum || 'Chưa cập nhật giáo trình'}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span class="text-lg font-bold text-blue-600">${counts.total}</span>
+                                <span class="text-sm text-gray-500">học viên</span>
+                            </div>
+                            ${counts.pending > 0 ? `<span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded">${counts.pending} chờ duyệt</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers
+        grid.querySelectorAll('.enrollment-course-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const course = JSON.parse(card.dataset.course.replace(/&#39;/g, "'"));
+                showEnrolledStudentsModal(course);
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error loading enrollments:', error);
+        grid.innerHTML = '<div class="col-span-full text-center text-red-500 py-8">Lỗi tải dữ liệu</div>';
+    }
+}
+
+// Show enrolled students modal
+async function showEnrolledStudentsModal(course) {
+    const modal = document.getElementById('enrolled-students-modal');
+    const tbody = document.getElementById('enrolled-students-tbody');
+    const categoryLabels = {
+        tieuhoc: 'Tiểu học',
+        thcs: 'THCS',
+        ielts: 'IELTS'
+    };
+    
+    const defaultImg = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=120&fit=crop';
+    const imgUrl = course.image_url ? (course.image_url.startsWith('http') ? course.image_url : BASE_PATH + course.image_url) : defaultImg;
+    
+    // Set course info
+    document.getElementById('enrolled-modal-title').textContent = `Học viên đăng ký: ${course.name}`;
+    const courseImg = document.getElementById('enrolled-course-image');
+    courseImg.src = imgUrl;
+    courseImg.onerror = function() { this.src = defaultImg; };
+    document.getElementById('enrolled-course-name').textContent = course.name;
+    document.getElementById('enrolled-course-info').textContent = `${categoryLabels[course.age_group] || course.age_group} | ${course.curriculum || 'Chưa cập nhật'}`;
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Load enrolled students
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><div class="spinner"></div></td></tr>';
+    
+    try {
+        const result = await adminService.getEnrollments();
+        if (!result.success) throw new Error('Failed to load enrollments');
+        
+        const courseEnrollments = (result.enrollments || []).filter(e => e.course_id == course.id);
+        
+        if (!courseEnrollments.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">Chưa có học viên đăng ký khóa học này</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = courseEnrollments.map((e, index) => `
+            <tr>
+                <td class="text-center">${index + 1}</td>
+                <td>
+                    <div class="font-medium">${e.fullname}</div>
+                    <div class="text-xs text-gray-500">${e.student_code || ''}</div>
                 </td>
+                <td>${e.email || '-'}</td>
+                <td>${e.created_at ? new Date(e.created_at).toLocaleDateString('vi-VN') : '-'}</td>
                 <td>${getStatusBadge(e.status)}</td>
                 <td>
-                    <button class="admin-action-btn secondary edit-enrollment-btn" data-id="${e.id}" data-enrollment='${JSON.stringify(e)}'>Sửa</button>
-                    <button class="admin-action-btn danger delete-enrollment-btn" data-id="${e.id}">Xóa</button>
+                    <select class="enrollment-status-select text-sm border rounded px-2 py-1" data-enrollment-id="${e.id}">
+                        <option value="pending" ${e.status === 'pending' ? 'selected' : ''}>Chờ duyệt</option>
+                        <option value="active" ${e.status === 'active' ? 'selected' : ''}>Đang học</option>
+                        <option value="completed" ${e.status === 'completed' ? 'selected' : ''}>Hoàn thành</option>
+                        <option value="cancelled" ${e.status === 'cancelled' ? 'selected' : ''}>Đã hủy</option>
+                    </select>
                 </td>
             </tr>
         `).join('');
-
-        // Edit handlers
-        tbody.querySelectorAll('.edit-enrollment-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const enrollment = JSON.parse(btn.dataset.enrollment);
-                showEnrollmentModal(enrollment);
-            });
-        });
-
-        // Delete handlers
-        tbody.querySelectorAll('.delete-enrollment-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!confirm('Bạn có chắc muốn xóa đăng ký này?')) return;
+        
+        // Add status change handlers
+        tbody.querySelectorAll('.enrollment-status-select').forEach(select => {
+            select.addEventListener('change', async (e) => {
+                const enrollmentId = select.dataset.enrollmentId;
+                const newStatus = select.value;
                 try {
-                    const result = await adminService.deleteEnrollment(btn.dataset.id);
+                    const result = await adminService.updateEnrollment({ id: enrollmentId, status: newStatus });
                     if (result.success) {
-                        showToast('Đã chuyển vào thùng rác!', 'success');
-                        renderEnrollments();
-                        updateTrashCount();
+                        showToast('Đã cập nhật trạng thái', 'success');
+                        renderEnrollments(); // Refresh grid
                     } else {
                         showToast(result.message || 'Có lỗi xảy ra', 'error');
+                        showEnrolledStudentsModal(course); // Reload modal
                     }
                 } catch (error) {
                     showToast('Lỗi kết nối', 'error');
                 }
             });
         });
+        
     } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-red-500">Lỗi tải dữ liệu</td></tr>';
+        console.error('Error:', error);
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-red-500 py-4">Lỗi tải dữ liệu</td></tr>';
     }
+    
+    // Close modal handler
+    modal.querySelector('.close-enrolled-modal').onclick = () => modal.classList.add('hidden');
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    };
 }
 
 // Store all courses for filtering
@@ -2683,6 +2816,217 @@ async function renderTrash(table = null) {
     }
 }
 
+// ==================== NOTIFICATIONS FUNCTIONS ====================
+
+let notificationsCurrentPage = 1;
+let notificationsTotalPages = 1;
+
+// Render Notifications
+async function renderNotifications(type = '', page = 1) {
+    const tbody = document.getElementById('notifications-tbody');
+    if (!tbody) return;
+    
+    try {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8"><div class="spinner"></div></td></tr>';
+        
+        const result = await adminService.getNotifications({ type, page, limit: 20 });
+        
+        if (!result.success || !result.data?.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray-500 py-8">Không có thông báo nào</td></tr>';
+            updateNotificationsBadge(0);
+            updateNotificationsPagination(1, 1);
+            return;
+        }
+        
+        updateNotificationsBadge(result.unread_count || 0);
+        notificationsCurrentPage = result.pagination?.page || 1;
+        notificationsTotalPages = result.pagination?.total_pages || 1;
+        updateNotificationsPagination(notificationsCurrentPage, notificationsTotalPages);
+        
+        const typeLabels = {
+            'review': { label: 'Đánh giá', color: '#fef3c7', textColor: '#b45309' },
+            'achievement': { label: 'Thành tích', color: '#d1fae5', textColor: '#047857' },
+            'score': { label: 'Điểm số', color: '#dbeafe', textColor: '#1d4ed8' },
+            'contact': { label: 'Liên hệ', color: '#fce7f3', textColor: '#be185d' },
+            'user': { label: 'Người dùng', color: '#e0e7ff', textColor: '#4338ca' },
+            'system': { label: 'Hệ thống', color: '#f3f4f6', textColor: '#374151' }
+        };
+        
+        tbody.innerHTML = result.data.map((notif, index) => {
+            const typeInfo = typeLabels[notif.type] || typeLabels['system'];
+            const startIdx = ((result.pagination?.page || 1) - 1) * 20;
+            
+            return `
+            <tr class="${notif.is_read == 0 ? 'bg-blue-50' : ''}">
+                <td>${startIdx + index + 1}</td>
+                <td>
+                    <span class="px-2 py-1 rounded text-xs font-medium" style="background: ${typeInfo.color}; color: ${typeInfo.textColor};">
+                        ${typeInfo.label}
+                    </span>
+                </td>
+                <td class="font-medium">${escapeHtml(notif.title)}</td>
+                <td class="max-w-xs truncate text-sm text-gray-600" title="${escapeHtml(notif.message)}">${escapeHtml(notif.message)}</td>
+                <td>
+                    ${notif.is_read == 0 
+                        ? '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">Mới</span>'
+                        : '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-500">Đã đọc</span>'
+                    }
+                </td>
+                <td class="text-sm text-gray-500">${formatDateTime(notif.created_at)}</td>
+                <td>
+                    <div class="flex gap-1">
+                        ${notif.is_read == 0 ? `
+                            <button class="text-blue-600 hover:text-blue-800 mark-read-btn" data-id="${notif.id}" title="Đánh dấu đã đọc">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                        <button class="text-red-600 hover:text-red-800 delete-notif-btn" data-id="${notif.id}" title="Xóa">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `}).join('');
+        
+        // Bind mark as read handlers
+        tbody.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const result = await adminService.markNotificationAsRead(btn.dataset.id);
+                if (result.success) {
+                    const filter = document.getElementById('notifications-type-filter')?.value || '';
+                    renderNotifications(filter, notificationsCurrentPage);
+                    loadHeaderNotifications();
+                }
+            });
+        });
+        
+        // Bind delete handlers
+        tbody.querySelectorAll('.delete-notif-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;
+                const result = await adminService.deleteNotification(btn.dataset.id);
+                if (result.success) {
+                    showToast('Đã xóa thông báo', 'success');
+                    const filter = document.getElementById('notifications-type-filter')?.value || '';
+                    renderNotifications(filter, notificationsCurrentPage);
+                    loadHeaderNotifications();
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('Render notifications error:', error);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-red-500 text-center py-8">Lỗi tải dữ liệu</td></tr>';
+    }
+}
+
+function updateNotificationsBadge(count) {
+    const badge = document.getElementById('notifications-badge');
+    const headerBadge = document.getElementById('notification-badge');
+    
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+    
+    if (headerBadge) {
+        if (count > 0) {
+            headerBadge.textContent = count > 99 ? '99+' : count;
+            headerBadge.classList.remove('hidden');
+        } else {
+            headerBadge.classList.add('hidden');
+        }
+    }
+}
+
+function updateNotificationsPagination(page, totalPages) {
+    const prevBtn = document.getElementById('notif-prev-page');
+    const nextBtn = document.getElementById('notif-next-page');
+    const pageInfo = document.getElementById('notif-page-info');
+    
+    if (pageInfo) pageInfo.textContent = `Trang ${page} / ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = page <= 1;
+    if (nextBtn) nextBtn.disabled = page >= totalPages;
+}
+
+// Load header notification dropdown
+async function loadHeaderNotifications() {
+    const list = document.getElementById('notification-list');
+    if (!list) return;
+    
+    try {
+        const result = await adminService.getNotifications({ limit: 10, unread_only: false });
+        
+        if (!result.success || !result.data?.length) {
+            list.innerHTML = '<div class="p-4 text-center text-gray-500">Không có thông báo mới</div>';
+            updateNotificationsBadge(0);
+            return;
+        }
+        
+        updateNotificationsBadge(result.unread_count || 0);
+        
+        const typeIcons = {
+            'review': '⭐',
+            'achievement': '🏆',
+            'score': '📊',
+            'contact': '📧',
+            'user': '👤',
+            'system': '🔔'
+        };
+        
+        list.innerHTML = result.data.map(notif => `
+            <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${notif.is_read == 0 ? 'bg-blue-50' : ''}" 
+                 onclick="window.markNotificationRead(${notif.id})">
+                <div class="flex items-start gap-2">
+                    <span class="text-lg">${typeIcons[notif.type] || '🔔'}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-800 truncate">${escapeHtml(notif.title)}</p>
+                        <p class="text-xs text-gray-500 truncate">${escapeHtml(notif.message)}</p>
+                        <p class="text-xs text-gray-400 mt-1">${formatTimeAgo(notif.created_at)}</p>
+                    </div>
+                    ${notif.is_read == 0 ? '<span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>' : ''}
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Load header notifications error:', error);
+        list.innerHTML = '<div class="p-4 text-center text-red-500">Lỗi tải thông báo</div>';
+    }
+}
+
+// Format time ago
+function formatTimeAgo(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffDays < 7) return `${diffDays} ngày trước`;
+    return formatDate(dateStr);
+}
+
+// Global function for notification click
+window.markNotificationRead = async function(id) {
+    await adminService.markNotificationAsRead(id);
+    loadHeaderNotifications();
+    const filter = document.getElementById('notifications-type-filter')?.value || '';
+    renderNotifications(filter, notificationsCurrentPage);
+};
+
 // ==================== MODAL FUNCTIONS ====================
 
 function showModal(content) {
@@ -3891,7 +4235,10 @@ function loadSectionData(section) {
             renderUsers();
             break;
         case 'enrollments':
-            renderEnrollments();
+            // Load with default filter set to 'open' courses
+            const courseStatusFilter = document.getElementById('enrollment-course-status-filter')?.value || 'open';
+            const categoryFilter = document.getElementById('enrollment-category-filter')?.value || '';
+            renderEnrollments(courseStatusFilter, categoryFilter);
             break;
         case 'courses':
             renderCourses();
@@ -3917,6 +4264,9 @@ function loadSectionData(section) {
         case 'trash':
             renderTrash();
             break;
+        case 'notifications':
+            renderNotifications();
+            break;
         case 'reviews':
             renderReviews();
             break;
@@ -3934,10 +4284,22 @@ function loadSectionData(section) {
 
 // Init filters
 function initFilters() {
-    // Enrollment filter
-    const enrollmentFilter = document.getElementById('enrollment-status-filter');
-    enrollmentFilter?.addEventListener('change', () => {
-        renderEnrollments(enrollmentFilter.value || null);
+    // Enrollment filters (new - course-based)
+    const enrollmentCourseStatusFilter = document.getElementById('enrollment-course-status-filter');
+    const enrollmentCategoryFilter = document.getElementById('enrollment-category-filter');
+    
+    enrollmentCourseStatusFilter?.addEventListener('change', () => {
+        renderEnrollments(
+            enrollmentCourseStatusFilter.value || '',
+            enrollmentCategoryFilter?.value || ''
+        );
+    });
+    
+    enrollmentCategoryFilter?.addEventListener('change', () => {
+        renderEnrollments(
+            enrollmentCourseStatusFilter?.value || '',
+            enrollmentCategoryFilter.value || ''
+        );
     });
 
     // Trash filter
@@ -3957,6 +4319,81 @@ function initFilters() {
     reviewsFilter?.addEventListener('change', () => {
         renderReviews(reviewsFilter.value || '');
     });
+    
+    // Notifications type filter
+    const notificationsTypeFilter = document.getElementById('notifications-type-filter');
+    notificationsTypeFilter?.addEventListener('change', () => {
+        renderNotifications(notificationsTypeFilter.value || '', 1);
+    });
+    
+    // Notifications pagination
+    document.getElementById('notif-prev-page')?.addEventListener('click', () => {
+        if (notificationsCurrentPage > 1) {
+            const filter = document.getElementById('notifications-type-filter')?.value || '';
+            renderNotifications(filter, notificationsCurrentPage - 1);
+        }
+    });
+    
+    document.getElementById('notif-next-page')?.addEventListener('click', () => {
+        if (notificationsCurrentPage < notificationsTotalPages) {
+            const filter = document.getElementById('notifications-type-filter')?.value || '';
+            renderNotifications(filter, notificationsCurrentPage + 1);
+        }
+    });
+    
+    // Mark all notifications as read
+    document.getElementById('mark-all-notifications-read')?.addEventListener('click', async () => {
+        const result = await adminService.markAllNotificationsAsRead();
+        if (result.success) {
+            showToast('Đã đánh dấu tất cả đã đọc', 'success');
+            const filter = document.getElementById('notifications-type-filter')?.value || '';
+            renderNotifications(filter, 1);
+            loadHeaderNotifications();
+        }
+    });
+    
+    // Header notification bell toggle
+    const notificationBtn = document.getElementById('notification-btn');
+    const notificationDropdown = document.getElementById('notification-dropdown');
+    
+    notificationBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notificationDropdown?.classList.toggle('hidden');
+        if (!notificationDropdown?.classList.contains('hidden')) {
+            loadHeaderNotifications();
+        }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#notification-container')) {
+            notificationDropdown?.classList.add('hidden');
+        }
+    });
+    
+    // Mark all read from dropdown
+    document.getElementById('mark-all-read-btn')?.addEventListener('click', async () => {
+        const result = await adminService.markAllNotificationsAsRead();
+        if (result.success) {
+            loadHeaderNotifications();
+            const filter = document.getElementById('notifications-type-filter')?.value || '';
+            renderNotifications(filter, 1);
+        }
+    });
+    
+    // View all notifications - switch to notifications section
+    document.getElementById('view-all-notifications')?.addEventListener('click', () => {
+        notificationDropdown?.classList.add('hidden');
+        // Switch to notifications section
+        document.querySelectorAll('.sidebar-menu-item').forEach(item => item.classList.remove('active'));
+        document.querySelector('[data-section="notifications"]')?.classList.add('active');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('section-notifications')?.classList.add('active');
+        renderNotifications();
+    });
+    
+    // Load notifications on startup
+    loadHeaderNotifications();
 }
 
 // Init add buttons
@@ -3965,7 +4402,7 @@ function initAddButtons() {
     document.getElementById('add-course-btn')?.addEventListener('click', () => showCourseModal());
     document.getElementById('add-schedule-btn')?.addEventListener('click', () => showScheduleModal());
     document.getElementById('add-teacher-btn')?.addEventListener('click', () => showTeacherModal());
-    document.getElementById('add-enrollment-btn')?.addEventListener('click', () => showNewEnrollmentModal());
+    // Removed: add-enrollment-btn - students now self-register
     document.getElementById('add-score-btn')?.addEventListener('click', () => showScoreModal());
     document.getElementById('add-feedback-btn')?.addEventListener('click', () => showFeedbackModal());
     document.getElementById('add-achievement-btn')?.addEventListener('click', () => showAchievementModal());
@@ -4116,8 +4553,8 @@ async function renderReviews(filter = '') {
             <td>${escapeHtml(review.fullname || review.user_name)}</td>
             <td>
                 ${review.user_avatar 
-                    ? `<img src="${review.user_avatar}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">`
-                    : `<div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">${(review.user_name || 'U').charAt(0).toUpperCase()}</div>`
+                    ? `<img src="${review.user_avatar}" alt="Avatar" class="w-10 h-10 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"><div class="w-10 h-10 rounded-full bg-blue-500 items-center justify-center text-white font-bold" style="display:none">${(review.fullname || review.user_name || 'U').charAt(0).toUpperCase()}</div>`
+                    : `<div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">${(review.fullname || review.user_name || 'U').charAt(0).toUpperCase()}</div>`
                 }
             </td>
             <td>
@@ -4128,7 +4565,7 @@ async function renderReviews(filter = '') {
             <td class="max-w-xs truncate" title="${escapeHtml(review.comment)}">${escapeHtml(review.comment?.substring(0, 50) + (review.comment?.length > 50 ? '...' : ''))}</td>
             <td>
                 ${review.image_url 
-                    ? `<img src="${review.image_url}" alt="Review" class="w-16 h-12 object-cover rounded cursor-pointer" onclick="window.open('${review.image_url}', '_blank')">`
+                    ? `<img src="${review.image_url}" alt="Review" class="w-16 h-12 object-cover rounded cursor-pointer" onclick="window.open('${review.image_url}', '_blank')" onerror="this.style.display='none'">`
                     : '-'
                 }
             </td>
@@ -5102,11 +5539,14 @@ function renderReviewsTable(reviews) {
             <td>${r.id}</td>
             <td>${escapeHtml(r.user_name)}</td>
             <td>
-                ${r.user_avatar ? `<img src="${BASE_PATH}${r.user_avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">` : '-'}
+                ${r.user_avatar 
+                    ? `<img src="${BASE_PATH}${r.user_avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"><div class="w-8 h-8 rounded-full bg-blue-500 items-center justify-center text-white font-bold text-sm" style="display:none">${(r.user_name || 'U').charAt(0).toUpperCase()}</div>` 
+                    : `<div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">${(r.user_name || 'U').charAt(0).toUpperCase()}</div>`
+                }
             </td>
             <td class="text-yellow-500">${'★'.repeat(r.rating)}</td>
             <td class="max-w-xs truncate">${escapeHtml(r.comment)}</td>
-            <td>${r.image_url ? `<img src="${BASE_PATH}${r.image_url}" alt="Review" class="w-12 h-12 object-cover rounded">` : '-'}</td>
+            <td>${r.image_url ? `<img src="${BASE_PATH}${r.image_url}" alt="Review" class="w-12 h-12 object-cover rounded" onerror="this.style.display='none'">` : '-'}</td>
             <td>
                 <span class="status-badge ${r.is_approved ? 'active' : 'pending'}">
                     ${r.is_approved ? 'Đã duyệt' : 'Chờ duyệt'}

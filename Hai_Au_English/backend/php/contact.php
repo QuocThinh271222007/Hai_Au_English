@@ -1,6 +1,8 @@
 <?php
-// contact.php - Gửi email từ form liên hệ (không lưu database)
+// contact.php - Gửi email từ form liên hệ và lưu database
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/notifications.php';
 
 // Set CORS headers using config
 setCorsHeaders();
@@ -124,7 +126,30 @@ $mailSent = mail(
     implode("\r\n", $headers)
 );
 
-if ($mailSent) {
+// Lưu vào database
+$contactId = null;
+try {
+    $pdo = getDBConnection();
+    $stmt = $pdo->prepare("
+        INSERT INTO contacts (fullname, email, phone, course, level, message, agreement)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([$fullname, $email, $phone, $course, $level, $message, $agreement]);
+    $contactId = $pdo->lastInsertId();
+    
+    // Tạo thông báo cho admin
+    createAdminNotification(
+        'contact',
+        'Liên hệ mới từ website',
+        "{$fullname} ({$phone}) quan tâm khóa học {$course}. Email: {$email}",
+        $contactId,
+        'contacts'
+    );
+} catch (Exception $e) {
+    error_log("Save Contact Error: " . $e->getMessage());
+}
+
+if ($mailSent || $contactId) {
     echo json_encode([
         'success' => true, 
         'message' => 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ sớm nhất.'

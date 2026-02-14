@@ -539,6 +539,140 @@ if ($method === 'POST') {
         exit;
     }
     
+    // Student self-enrollment
+    if ($action === 'enroll-course') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $courseId = intval($input['course_id'] ?? 0);
+        
+        if (!$courseId) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Vui lòng chọn khóa học']);
+            exit;
+        }
+        
+        // Check if course exists and is active
+        $stmt = $mysqli->prepare('SELECT id, name, is_active FROM courses WHERE id = ?');
+        $stmt->bind_param('i', $courseId);
+        $stmt->execute();
+        $course = $stmt->get_result()->fetch_assoc();
+        
+        if (!$course) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Khóa học không tồn tại']);
+            exit;
+        }
+        
+        if (!$course['is_active']) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Khóa học này đã đóng đăng ký']);
+            exit;
+        }
+        
+        // Check if already enrolled
+        $stmt = $mysqli->prepare('SELECT id, status FROM enrollments WHERE user_id = ? AND course_id = ?');
+        $stmt->bind_param('ii', $userId, $courseId);
+        $stmt->execute();
+        $existing = $stmt->get_result()->fetch_assoc();
+        
+        if ($existing) {
+            $statusText = [
+                'pending' => 'đang chờ duyệt',
+                'active' => 'đang học',
+                'completed' => 'đã hoàn thành',
+                'cancelled' => 'đã hủy'
+            ];
+            http_response_code(400);
+            echo json_encode([
+                'success' => false, 
+                'error' => 'Bạn đã đăng ký khóa học này (' . ($statusText[$existing['status']] ?? $existing['status']) . ')'
+            ]);
+            exit;
+        }
+        
+        // Create enrollment
+        $academicYear = date('Y') . '-' . (date('Y') + 1);
+        $semester = (date('n') >= 8) ? 'Học kỳ 1' : 'Học kỳ 2';
+        $enrolledDate = date('Y-m-d');
+        $status = 'pending'; // Need admin approval
+        
+        $stmt = $mysqli->prepare('
+            INSERT INTO enrollments (user_id, course_id, academic_year, semester, enrolled_date, status)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ');
+        $stmt->bind_param('iissss', $userId, $courseId, $academicYear, $semester, $enrolledDate, $status);
+        
+        if ($stmt->execute()) {
+            // Create notification for admin
+            require_once __DIR__ . '/notifications.php';
+            
+            $userStmt = $mysqli->prepare('SELECT fullname FROM users WHERE id = ?');
+            $userStmt->bind_param('i', $userId);
+            $userStmt->execute();
+            $userName = $userStmt->get_result()->fetch_assoc()['fullname'] ?? 'Học viên';
+            
+            createAdminNotification(
+                'enrollment', 
+                'Đăng ký khóa học mới', 
+                "Học viên {$userName} đăng ký khóa học \"{$course['name']}\"",
+                $mysqli->insert_id,
+                'enrollments'
+            );
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Đăng ký khóa học thành công! Vui lòng chờ admin xác nhận.',
+                'enrollment_id' => $mysqli->insert_id
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Lỗi khi đăng ký: ' . $mysqli->error]);
+        }
+        exit;
+    }
+    
+    // Cancel pending enrollment
+    if ($action === 'cancel-enrollment') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $enrollmentId = intval($input['enrollment_id'] ?? 0);
+        
+        if (!$enrollmentId) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'ID đăng ký không hợp lệ']);
+            exit;
+        }
+        
+        // Check if enrollment exists and belongs to current user
+        $stmt = $mysqli->prepare('SELECT id, status, course_id FROM enrollments WHERE id = ? AND user_id = ?');
+        $stmt->bind_param('ii', $enrollmentId, $userId);
+        $stmt->execute();
+        $enrollment = $stmt->get_result()->fetch_assoc();
+        
+        if (!$enrollment) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Không tìm thấy đăng ký']);
+            exit;
+        }
+        
+        // Only allow cancelling pending enrollments
+        if ($enrollment['status'] !== 'pending') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Chỉ có thể hủy đăng ký đang chờ duyệt']);
+            exit;
+        }
+        
+        // Delete the enrollment
+        $stmt = $mysqli->prepare('DELETE FROM enrollments WHERE id = ?');
+        $stmt->bind_param('i', $enrollmentId);
+        
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Đã hủy đăng ký']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Lỗi khi hủy đăng ký']);
+        }
+        exit;
+    }
+    
     http_response_code(400);
     echo json_encode(['error' => 'Action không hợp lệ']);
     exit;

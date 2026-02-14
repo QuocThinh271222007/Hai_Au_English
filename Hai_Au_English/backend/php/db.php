@@ -1,6 +1,12 @@
 <?php
 // Database connection file - DO NOT output anything here
 
+// Prevent multiple includes
+if (defined('HAI_AU_DB_LOADED')) {
+    return $mysqli ?? null;
+}
+define('HAI_AU_DB_LOADED', true);
+
 // Include config file
 require_once __DIR__ . '/config.php';
 

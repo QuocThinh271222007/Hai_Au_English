@@ -2,12 +2,14 @@
 // auth.php - Đăng ký, đăng nhập, xác thực người dùng
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/oauth_config.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/notifications.php';
 
 // Set CORS headers using config
 setCorsHeaders();
 
 require_once __DIR__ . '/session_config.php';
-$mysqli = require __DIR__ . '/db.php';
+$mysqli = getMySQLiConnection();
 
 $action = $_GET['action'] ?? '';
 
@@ -144,6 +146,9 @@ if ($action === 'register') {
     
     $userId = $mysqli->insert_id;
     $stmt->close();
+    
+    // Tạo thông báo cho admin
+    createAdminNotification('user', 'Người dùng mới đăng ký', 'Người dùng "' . $fullname . '" đã đăng ký tài khoản. Email: ' . $email, $userId, 'users');
     
     // Auto login after register
     $_SESSION['user_id'] = $userId;

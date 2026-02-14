@@ -11,6 +11,7 @@
 require_once 'config.php';
 require_once 'db.php';
 require_once 'session_config.php';
+require_once 'notifications.php';
 
 // Set CORS headers
 setCorsHeaders();
@@ -150,6 +151,17 @@ function createReview() {
     $pdo = getDBConnection();
     
     try {
+        // Kiểm tra giới hạn số review được duyệt
+        $limitSettings = getLimitSettings();
+        $approvedCount = countApprovedReviews();
+        $isApproved = 1; // Mặc định được duyệt
+        $pendingMessage = '';
+        
+        if ($limitSettings['auto_pending_reviews'] && $approvedCount >= $limitSettings['max_approved_reviews']) {
+            $isApproved = 0; // Tự động đặt chờ duyệt
+            $pendingMessage = ' Đánh giá đang chờ duyệt vì số lượng đã đạt giới hạn.';
+        }
+        
         // Kiểm tra xem user đã review chưa (giới hạn 1 review/user nếu cần)
         // $checkStmt = $pdo->prepare("SELECT id FROM reviews WHERE user_id = ?");
         // $checkStmt->execute([$userId]);
@@ -160,21 +172,30 @@ function createReview() {
         
         $stmt = $pdo->prepare("
             INSERT INTO reviews (user_id, user_name, rating, comment, image_url, is_approved)
-            VALUES (?, ?, ?, ?, ?, 1)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
         
-        $stmt->execute([$userId, $userName, $rating, $comment, $imageUrl]);
+        $stmt->execute([$userId, $userName, $rating, $comment, $imageUrl, $isApproved]);
         $reviewId = $pdo->lastInsertId();
+        
+        // Tạo thông báo cho admin
+        $notifTitle = $isApproved ? 'Đánh giá mới' : 'Đánh giá mới (Chờ duyệt)';
+        $notifMessage = "{$userName} đã gửi đánh giá {$rating} sao: \"{$comment}\"";
+        if (!$isApproved) {
+            $notifMessage .= " [Đang chờ duyệt vì đã đạt giới hạn {$limitSettings['max_approved_reviews']} đánh giá]";
+        }
+        createAdminNotification('review', $notifTitle, $notifMessage, $reviewId, 'reviews');
         
         jsonResponse([
             'success' => true,
-            'message' => 'Đánh giá của bạn đã được gửi!',
+            'message' => 'Đánh giá của bạn đã được gửi!' . $pendingMessage,
             'data' => [
                 'id' => $reviewId,
                 'user_name' => $userName,
                 'rating' => $rating,
                 'comment' => $comment,
                 'image_url' => $imageUrl,
+                'is_approved' => $isApproved,
                 'created_at' => date('Y-m-d H:i:s')
             ]
         ], 201);
@@ -207,7 +228,7 @@ function deleteReview() {
     
     try {
         // Kiểm tra quyền sở hữu
-        $checkStmt = $pdo->prepare("SELECT user_id, image_url FROM reviews WHERE id = ?");
+        $checkStmt = $pdo->prepare("SELECT user_id, user_name, comment, image_url FROM reviews WHERE id = ?");
         $checkStmt->execute([$reviewId]);
         $review = $checkStmt->fetch(PDO::FETCH_ASSOC);
         
@@ -232,6 +253,9 @@ function deleteReview() {
         // Xóa review
         $stmt = $pdo->prepare("DELETE FROM reviews WHERE id = ?");
         $stmt->execute([$reviewId]);
+        
+        $deletedBy = $isAdmin ? 'Admin' : ($review['user_name'] ?? 'Người dùng');
+        createAdminNotification('review', 'Xóa đánh giá', 'Đánh giá của ' . ($review['user_name'] ?? 'người dùng') . ' đã bị xóa bởi ' . $deletedBy . ': "' . substr($review['comment'] ?? '', 0, 50) . '..."', $reviewId, 'reviews');
         
         jsonResponse(['success' => true, 'message' => 'Đã xóa đánh giá']);
         

@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </ul>
           <div class="course-card-footer">
             <span class="course-card-price">${formatMoney(course.price)}đ<small>/tháng</small></span>
-            <a href="/LienHe" class="course-card-btn">Đăng ký</a>
+            <button class="course-card-btn enroll-course-btn" data-course-id="${course.id}" data-course-name="${course.name.replace(/"/g, '&quot;')}">Đăng ký</button>
           </div>
         </div>
       </div>
@@ -363,9 +363,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 `}
                 
                 <div class="mt-4 pt-4 border-t flex justify-end gap-3">
-                  <a href="${BASE_PATH}/LienHe" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors enroll-course-btn" data-course-id="${course.id}" data-course-name="${courseName.replace(/"/g, '&quot;')}">
                     Đăng ký lớp này
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -382,6 +382,110 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
     }
   };
+  
+  // ====== ENROLLMENT HANDLER ======
+  // Handle enrollment button clicks
+  document.body.addEventListener('click', async function(e) {
+    const enrollBtn = e.target.closest('.enroll-course-btn');
+    if (!enrollBtn) return;
+    
+    e.preventDefault();
+    
+    const courseId = enrollBtn.dataset.courseId;
+    const courseName = enrollBtn.dataset.courseName;
+    
+    // Check if user is logged in by checking the user-menu visibility or localStorage cache
+    const userMenu = document.getElementById('user-menu');
+    const isLoggedIn = (userMenu && !userMenu.classList.contains('hidden')) || 
+                       localStorage.getItem('hai_au_user_id');
+    
+    if (!isLoggedIn) {
+      // Try to verify with API first
+      try {
+        const checkResponse = await fetch(`${BASE_PATH}/backend/php/auth.php?action=check`, {
+          credentials: 'include'
+        });
+        const checkResult = await checkResponse.json();
+        
+        if (!checkResult.loggedIn) {
+          if (confirm(`Bạn cần đăng nhập để đăng ký khóa học "${courseName}".\nBạn có muốn đăng nhập ngay?`)) {
+            window.location.href = BASE_PATH + '/DangNhap?redirect=' + encodeURIComponent(window.location.pathname);
+          }
+          return;
+        }
+      } catch (e) {
+        if (confirm(`Bạn cần đăng nhập để đăng ký khóa học "${courseName}".\nBạn có muốn đăng nhập ngay?`)) {
+          window.location.href = BASE_PATH + '/DangNhap?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+        return;
+      }
+    }
+    
+    // Confirm enrollment
+    if (!confirm(`Bạn muốn đăng ký khóa học "${courseName}"?\n\nSau khi đăng ký, admin sẽ xác nhận và liên hệ với bạn.`)) {
+      return;
+    }
+    
+    // Disable button and show loading
+    const originalText = enrollBtn.innerHTML;
+    enrollBtn.disabled = true;
+    enrollBtn.innerHTML = '<span class="animate-spin inline-block mr-2">⏳</span> Đang xử lý...';
+    
+    try {
+      const response = await fetch(`${BASE_PATH}/backend/php/profile.php?action=enroll-course`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ course_id: parseInt(courseId) })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Show success message
+        showToast(result.message || 'Đăng ký thành công!', 'success');
+        enrollBtn.innerHTML = '✅ Đã đăng ký';
+        enrollBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        enrollBtn.classList.add('bg-green-600', 'cursor-not-allowed');
+      } else {
+        showToast(result.error || 'Có lỗi xảy ra', 'error');
+        enrollBtn.disabled = false;
+        enrollBtn.innerHTML = originalText;
+      }
+    } catch (error) {
+      console.error('Enrollment error:', error);
+      showToast('Lỗi kết nối. Vui lòng thử lại.', 'error');
+      enrollBtn.disabled = false;
+      enrollBtn.innerHTML = originalText;
+    }
+  });
+  
+  // Simple toast notification
+  function showToast(message, type = 'info') {
+    // Remove existing toast
+    const existingToast = document.querySelector('.course-toast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = `course-toast fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
+      type === 'success' ? 'bg-green-600 text-white' : 
+      type === 'error' ? 'bg-red-600 text-white' : 
+      'bg-gray-800 text-white'
+    }`;
+    toast.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+        <span>${message}</span>
+      </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-2');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
 });
 
 export default null;

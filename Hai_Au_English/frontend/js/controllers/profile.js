@@ -180,9 +180,12 @@ async function renderCourses() {
             return;
         }
 
-        container.innerHTML = result.enrollments.map(e => `
+        container.innerHTML = result.enrollments.map(e => {
+            const defaultImg = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=150&fit=crop';
+            const imgUrl = e.image_url ? (e.image_url.startsWith('http') ? e.image_url : BASE_PATH + e.image_url) : defaultImg;
+            return `
             <div class="enrollment-card">
-                <img src="${e.image_url || '../assets/images/course-default.jpg'}" alt="${e.course_name}" class="enrollment-image">
+                <img src="${imgUrl}" alt="${e.course_name}" class="enrollment-image" onerror="this.src='${defaultImg}'">
                 <div class="enrollment-info">
                     <h3 class="enrollment-title">${e.course_name}</h3>
                     <div class="enrollment-meta">
@@ -200,7 +203,225 @@ async function renderCourses() {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
+    } catch (error) {
+        container.innerHTML = '<p class="text-red-500">Lỗi tải dữ liệu</p>';
+    }
+}
+
+// Store all available courses
+let allAvailableCourses = [];
+
+// Render available courses for enrollment
+async function renderAvailableCourses(filter = 'all') {
+    const grid = document.getElementById('available-courses-grid');
+    if (!grid) return;
+    
+    const categoryLabels = {
+        tieuhoc: { text: 'Tiểu học', bg: '#dcfce7', color: '#166534' },
+        thcs: { text: 'THCS', bg: '#dbeafe', color: '#1e40af' },
+        ielts: { text: 'IELTS', bg: '#f3e8ff', color: '#7c3aed' }
+    };
+    
+    try {
+        // Get all courses and user's enrollments
+        const [coursesRes, enrollmentRes] = await Promise.all([
+            fetch(BASE_PATH + '/backend/php/courses.php', { credentials: 'include' }).then(r => r.json()),
+            profileService.getEnrollments()
+        ]);
+        
+        // Use 'courses' instead of 'data' from API response
+        const coursesData = coursesRes.courses || coursesRes.data || [];
+        
+        if (!coursesRes.success || !coursesData.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-8">Không có khóa học nào đang mở</div>';
+            return;
+        }
+        
+        // Get enrolled course IDs (convert to strings for comparison)
+        const enrolledCourseIds = new Set((enrollmentRes.enrollments || []).map(e => String(e.course_id)));
+        
+        // Filter active courses that user hasn't enrolled in
+        allAvailableCourses = coursesData.filter(c => 
+            (c.is_active === 1 || c.is_active === '1') && 
+            !enrolledCourseIds.has(c.id) && 
+            !enrolledCourseIds.has(String(c.id))
+        );
+        
+        // Apply category filter
+        let filteredCourses = allAvailableCourses;
+        if (filter !== 'all') {
+            filteredCourses = allAvailableCourses.filter(c => c.age_group === filter);
+        }
+        
+        if (!filteredCourses.length) {
+            grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-8">
+                ${filter === 'all' ? 'Bạn đã đăng ký tất cả khóa học hoặc không có khóa học nào đang mở' : 'Không có khóa học nào trong danh mục này'}
+            </div>`;
+            return;
+        }
+        
+        grid.innerHTML = filteredCourses.map(course => {
+            const categoryStyle = categoryLabels[course.age_group] || { text: course.age_group, bg: '#f3f4f6', color: '#374151' };
+            const imgUrl = course.image_url ? (course.image_url.startsWith('http') ? course.image_url : BASE_PATH + course.image_url) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=250&fit=crop';
+            
+            return `
+                <div class="available-course-card bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="relative">
+                        <img src="${imgUrl}" alt="${escapeHtml(course.name)}" 
+                             class="w-full h-32 object-cover"
+                             onerror="this.src='https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=250&fit=crop'">
+                        <span class="absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded"
+                              style="background: ${categoryStyle.bg}; color: ${categoryStyle.color}">
+                            ${categoryStyle.text}
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">${escapeHtml(course.name)}</h3>
+                        <p class="text-sm text-gray-600 mb-3 line-clamp-2">${escapeHtml(course.curriculum || 'Chưa cập nhật giáo trình')}</p>
+                        ${course.fee ? `<p class="text-sm font-bold text-blue-600 mb-3">${new Intl.NumberFormat('vi-VN').format(course.fee)}đ/tháng</p>` : ''}
+                        <button type="button" class="enroll-course-btn w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                                data-course-id="${course.id}" data-course-name="${escapeHtml(course.name)}">
+                            Đăng ký học
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers
+        grid.querySelectorAll('.enroll-course-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const courseId = btn.dataset.courseId;
+                const courseName = btn.dataset.courseName;
+                
+                if (!confirm(`Bạn muốn đăng ký khóa học "${courseName}"?\n\nSau khi đăng ký, admin sẽ xem xét và phân lớp cho bạn.`)) {
+                    return;
+                }
+                
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-sm"></span> Đang xử lý...';
+                
+                try {
+                    const response = await fetch(BASE_PATH + '/backend/php/profile.php?action=enroll-course', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ course_id: courseId })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showToast('Đăng ký thành công! Vui lòng chờ admin duyệt.', 'success');
+                        renderAvailableCourses(getCurrentFilter());
+                        renderPendingEnrollments();
+                    } else {
+                        showToast(result.message || 'Có lỗi xảy ra', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Đăng ký học';
+                    }
+                } catch (error) {
+                    showToast('Lỗi kết nối', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Đăng ký học';
+                }
+            });
+        });
+        
+        // Init filter buttons
+        initEnrollFilters();
+        
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        grid.innerHTML = '<div class="col-span-full text-center text-red-500 py-8">Lỗi tải dữ liệu</div>';
+    }
+}
+
+// Get current filter value
+function getCurrentFilter() {
+    const activeBtn = document.querySelector('.enroll-filter-btn.active');
+    return activeBtn ? activeBtn.dataset.filter : 'all';
+}
+
+// Init enrollment filter buttons
+function initEnrollFilters() {
+    const filterBtns = document.querySelectorAll('.enroll-filter-btn');
+    filterBtns.forEach(btn => {
+        btn.onclick = () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderAvailableCourses(btn.dataset.filter);
+        };
+    });
+}
+
+// Render pending enrollments
+async function renderPendingEnrollments() {
+    const container = document.getElementById('pending-enrollments-container');
+    if (!container) return;
+    
+    try {
+        const result = await profileService.getEnrollments();
+        const pendingEnrollments = (result.enrollments || []).filter(e => e.status === 'pending');
+        
+        if (!pendingEnrollments.length) {
+            container.innerHTML = '<p class="text-gray-500 text-center py-4">Không có đăng ký nào đang chờ duyệt</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="space-y-3">
+                ${pendingEnrollments.map(e => `
+                    <div class="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${escapeHtml(e.course_name)}</h4>
+                            <p class="text-sm text-gray-500">Đăng ký: ${formatDate(e.created_at)}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="status-badge pending">Chờ duyệt</span>
+                            <button type="button" class="cancel-enrollment-btn text-red-500 hover:text-red-700 text-sm"
+                                    data-enrollment-id="${e.id}" data-course-name="${escapeHtml(e.course_name)}">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Add cancel handlers
+        container.querySelectorAll('.cancel-enrollment-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const enrollmentId = btn.dataset.enrollmentId;
+                const courseName = btn.dataset.courseName;
+                
+                if (!confirm(`Bạn có chắc muốn hủy đăng ký khóa học "${courseName}"?`)) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(BASE_PATH + '/backend/php/profile.php?action=cancel-enrollment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ enrollment_id: enrollmentId })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showToast('Đã hủy đăng ký', 'success');
+                        renderAvailableCourses(getCurrentFilter());
+                        renderPendingEnrollments();
+                    } else {
+                        showToast(result.message || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (error) {
+                    showToast('Lỗi kết nối', 'error');
+                }
+            });
+        });
+        
     } catch (error) {
         container.innerHTML = '<p class="text-red-500">Lỗi tải dữ liệu</p>';
     }
@@ -991,6 +1212,10 @@ function loadSectionData(section) {
             break;
         case 'courses':
             renderCourses();
+            break;
+        case 'enroll':
+            renderAvailableCourses();
+            renderPendingEnrollments();
             break;
         case 'scores':
             renderScores();

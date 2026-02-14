@@ -1,11 +1,12 @@
 <?php
 // users.php - Quản lý user (admin)
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 // Set CORS headers using config
 setCorsHeaders();
 
-$mysqli = require __DIR__ . '/db.php';
+$mysqli = getMySQLiConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $result = $mysqli->query('SELECT id, fullname, email, created_at FROM users');

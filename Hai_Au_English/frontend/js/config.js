@@ -80,6 +80,9 @@ const API_CONFIG = {
     },
     get ACHIEVEMENTS() {
         return `${this.BASE_URL}${this.API_PATH}/achievements.php`;
+    },
+    get NOTIFICATIONS() {
+        return `${this.BASE_URL}${this.API_PATH}/notifications.php`;
     }
 };
 

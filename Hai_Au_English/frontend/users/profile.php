@@ -101,6 +101,13 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                 <span>Khóa học đã đăng ký</span>
             </div>
 
+            <div class="sidebar-menu-item" data-section="enroll">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Đăng ký khóa học</span>
+            </div>
+
             <div class="sidebar-menu-item" data-section="scores">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -231,6 +238,41 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                     <h2 class="profile-card-title">Khóa học đã đăng ký</h2>
                 </div>
                 <div id="courses-container">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Enroll Course Section -->
+        <section id="section-enroll" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Đăng ký khóa học mới</h2>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-600 text-sm">Chọn khóa học bạn muốn đăng ký. Sau khi đăng ký, admin sẽ xác nhận và phân lớp cho bạn.</p>
+                </div>
+                
+                <!-- Filter by category -->
+                <div class="flex gap-2 mb-4 flex-wrap">
+                    <button type="button" class="enroll-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="all">Tất cả</button>
+                    <button type="button" class="enroll-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="tieuhoc">Tiểu học</button>
+                    <button type="button" class="enroll-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="thcs">THCS</button>
+                    <button type="button" class="enroll-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors" data-filter="ielts">IELTS</button>
+                </div>
+                
+                <!-- Available courses grid -->
+                <div id="available-courses-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            
+            <!-- Pending enrollments -->
+            <div class="profile-card mt-6">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Đang chờ duyệt</h2>
+                </div>
+                <div id="pending-enrollments-container">
                     <div class="spinner"></div>
                 </div>
             </div>

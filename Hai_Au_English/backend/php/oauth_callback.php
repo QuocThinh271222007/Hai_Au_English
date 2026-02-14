@@ -4,10 +4,11 @@
  * Xử lý callback từ Google/Facebook OAuth
  */
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/oauth_config.php';
 require_once __DIR__ . '/session_config.php';
 
-$mysqli = require __DIR__ . '/db.php';
+$mysqli = getMySQLiConnection();
 
 $provider = $_GET['provider'] ?? '';
 $code = $_GET['code'] ?? '';

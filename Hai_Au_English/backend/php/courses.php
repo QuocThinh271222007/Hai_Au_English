@@ -1,11 +1,12 @@
 <?php
 // courses.php - Quản lý khóa học (API đầy đủ)
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/db.php';
 
 // Set CORS headers using config
 setCorsHeaders();
 
-$mysqli = require __DIR__ . '/db.php';
+$mysqli = getMySQLiConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 
 // GET - Lấy danh sách khóa học

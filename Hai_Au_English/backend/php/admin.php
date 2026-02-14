@@ -12,6 +12,7 @@ setCorsHeaders();
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/notifications.php';
 
 // Helper function for JSON encoding with UTF-8 support
 function json_response($data) {
@@ -278,6 +279,8 @@ try {
             ]);
             
             $newId = $pdo->lastInsertId();
+            createAdminNotification('user', 'Học viên mới', 'Đã thêm học viên "' . ($data['fullname'] ?? '') . '" vào hệ thống', $newId, 'users');
+            
             json_response(['success' => true, 'message' => 'Thêm học viên thành công', 'id' => $newId]);
             break;
             
@@ -315,6 +318,7 @@ try {
                 WHERE id = ?
             ");
             $stmt->execute([$fullname, $email, $phone, $isActive, $userId]);
+            createAdminNotification('user', 'Cập nhật học viên', 'Thông tin học viên "' . $fullname . '" đã được cập nhật', $userId, 'users');
             
             json_response(['success' => true, 'message' => 'Cập nhật thành công']);
             break;
@@ -337,6 +341,7 @@ try {
             
             // Di chuyển vào thùng rác
             moveToTrash('users', $userId, $adminId);
+            createAdminNotification('user', 'Xóa học viên', 'Học viên đã được chuyển vào thùng rác', $userId, 'users');
             
             json_response(['success' => true, 'message' => 'Đã chuyển vào thùng rác']);
             break;
@@ -409,7 +414,10 @@ try {
                 $features
             ]);
             
-            json_response(['success' => true, 'message' => 'Thêm khóa học thành công', 'id' => $pdo->lastInsertId()]);
+            $courseId = $pdo->lastInsertId();
+            createAdminNotification('course', 'Khóa học mới', 'Đã thêm khóa học "' . ($data['name'] ?? '') . '"', $courseId, 'courses');
+            
+            json_response(['success' => true, 'message' => 'Thêm khóa học thành công', 'id' => $courseId]);
             break;
             
         case 'course-update':
@@ -486,6 +494,7 @@ try {
                 $features,
                 $data['id']
             ]);
+            createAdminNotification('course', 'Cập nhật khóa học', 'Khóa học "' . ($data['name'] ?? '') . '" đã được cập nhật', $data['id'], 'courses');
             
             json_response(['success' => true, 'message' => 'Cập nhật khóa học thành công']);
             break;
@@ -494,7 +503,14 @@ try {
             $adminId = checkAdmin();
             
             $data = json_decode(file_get_contents('php://input'), true);
+            
+            // Lấy tên khóa học trước khi xóa
+            $courseStmt = $pdo->prepare("SELECT name FROM courses WHERE id = ?");
+            $courseStmt->execute([$data['id']]);
+            $courseName = $courseStmt->fetchColumn() ?: 'Khóa học';
+            
             moveToTrash('courses', $data['id'], $adminId);
+            createAdminNotification('course', 'Xóa khóa học', 'Khóa học "' . $courseName . '" đã được chuyển vào thùng rác', $data['id'], 'courses');
             
             json_response(['success' => true, 'message' => 'Đã chuyển vào thùng rác']);
             break;
@@ -546,7 +562,10 @@ try {
                 $data['progress'] ?? 0
             ]);
             
-            json_response(['success' => true, 'message' => 'Thêm đăng ký thành công']);
+            $enrollmentId = $pdo->lastInsertId();
+            createAdminNotification('enrollment', 'Đăng ký mới', 'Có đăng ký khóa học mới', $enrollmentId, 'enrollments');
+            
+            json_response(['success' => true, 'message' => 'Thêm đăng ký thành công', 'id' => $enrollmentId]);
             break;
             
         case 'enrollment-update':
@@ -586,6 +605,7 @@ try {
                 isset($data['class_id']) ? ($data['class_id'] ?: null) : $current['class_id'],
                 $enrollmentId
             ]);
+            createAdminNotification('enrollment', 'Cập nhật đăng ký', 'Đăng ký khóa học #' . $enrollmentId . ' đã được cập nhật', $enrollmentId, 'enrollments');
             
             json_response(['success' => true, 'message' => 'Cập nhật thành công']);
             break;
@@ -595,6 +615,7 @@ try {
             
             $data = json_decode(file_get_contents('php://input'), true);
             moveToTrash('enrollments', $data['id'], $adminId);
+            createAdminNotification('enrollment', 'Xóa đăng ký', 'Đăng ký khóa học #' . $data['id'] . ' đã được chuyển vào thùng rác', $data['id'], 'enrollments');
             
             json_response(['success' => true, 'message' => 'Đã chuyển vào thùng rác']);
             break;
@@ -649,6 +670,8 @@ try {
                            $startDate, $endDate, $academicYear, $semester, $status, $description]);
             
             $classId = $pdo->lastInsertId();
+            createAdminNotification('class', 'Lớp học mới', 'Đã tạo lớp học "' . $name . '"', $classId, 'classes');
+            
             json_response(['success' => true, 'message' => 'Tạo lớp học thành công', 'id' => $classId]);
             break;
             
@@ -696,6 +719,7 @@ try {
             ");
             $stmt->execute([$name, $courseId, $teacherId, $maxStudents, $schedule, $room,
                            $startDate, $endDate, $academicYear, $semester, $status, $description, $id]);
+            createAdminNotification('class', 'Cập nhật lớp học', 'Lớp học "' . $name . '" đã được cập nhật', $id, 'classes');
             
             json_response(['success' => true, 'message' => 'Cập nhật lớp học thành công']);
             break;
@@ -721,8 +745,14 @@ try {
                 break;
             }
             
+            // Lấy tên lớp trước khi xóa
+            $classStmt = $pdo->prepare("SELECT name FROM classes WHERE id = ?");
+            $classStmt->execute([$id]);
+            $className = $classStmt->fetchColumn() ?: 'Lớp học';
+            
             $stmt = $pdo->prepare("DELETE FROM classes WHERE id = ?");
             $stmt->execute([$id]);
+            createAdminNotification('class', 'Xóa lớp học', 'Lớp học "' . $className . '" đã được xóa', $id, 'classes');
             
             json_response(['success' => true, 'message' => 'Xóa lớp học thành công']);
             break;
@@ -1259,7 +1289,10 @@ try {
             // Update classes.schedule field (summary text)
             updateClassScheduleSummary($pdo, $classId);
             
-            json_response(['success' => true, 'message' => 'Đã thêm lịch học thành công', 'id' => $pdo->lastInsertId()]);
+            $scheduleId = $pdo->lastInsertId();
+            createAdminNotification('schedule', 'Lịch học mới', 'Đã thêm lịch học cho lớp', $scheduleId, 'class_schedules');
+            
+            json_response(['success' => true, 'message' => 'Đã thêm lịch học thành công', 'id' => $scheduleId]);
             break;
         
         case 'schedule-update':
@@ -1348,6 +1381,7 @@ try {
             
             // Update classes.schedule field
             updateClassScheduleSummary($pdo, $current['class_id']);
+            createAdminNotification('schedule', 'Cập nhật lịch học', 'Lịch học đã được cập nhật', $scheduleId, 'class_schedules');
             
             json_response(['success' => true, 'message' => 'Cập nhật lịch học thành công']);
             break;
@@ -1374,6 +1408,7 @@ try {
             if ($classId) {
                 updateClassScheduleSummary($pdo, $classId);
             }
+            createAdminNotification('schedule', 'Xóa lịch học', 'Lịch học đã được xóa', $scheduleId, 'class_schedules');
             
             json_response(['success' => true, 'message' => 'Đã xóa lịch học']);
             break;
@@ -1594,6 +1629,8 @@ try {
             ]);
             
             $newId = $pdo->lastInsertId();
+            createAdminNotification('teacher', 'Giảng viên mới', 'Đã thêm giảng viên "' . ($data['name'] ?? '') . '"', $newId, 'teachers');
+            
             json_response(['success' => true, 'message' => 'Thêm giảng viên thành công', 'id' => $newId]);
             break;
             
@@ -1664,6 +1701,7 @@ try {
                 $data['is_active'] ?? 1,
                 $data['id']
             ]);
+            createAdminNotification('teacher', 'Cập nhật giảng viên', 'Giảng viên "' . ($data['name'] ?? '') . '" đã được cập nhật', $data['id'], 'teachers');
             
             json_response(['success' => true, 'message' => 'Cập nhật giảng viên thành công']);
             break;
@@ -1672,7 +1710,14 @@ try {
             $adminId = checkAdmin();
             
             $data = json_decode(file_get_contents('php://input'), true);
+            
+            // Lấy tên giảng viên trước khi xóa
+            $teacherStmt = $pdo->prepare("SELECT name FROM teachers WHERE id = ?");
+            $teacherStmt->execute([$data['id']]);
+            $teacherName = $teacherStmt->fetchColumn() ?: 'Giảng viên';
+            
             moveToTrash('teachers', $data['id'], $adminId);
+            createAdminNotification('teacher', 'Xóa giảng viên', 'Giảng viên "' . $teacherName . '" đã được chuyển vào thùng rác', $data['id'], 'teachers');
             
             json_response(['success' => true, 'message' => 'Đã chuyển vào thùng rác']);
             break;
@@ -1719,6 +1764,24 @@ try {
                 $data['notes'] ?? ''
             ]);
             
+            $scoreId = $pdo->lastInsertId();
+            
+            // Lấy tên học viên
+            $userStmt = $pdo->prepare("SELECT fullname FROM users WHERE id = ?");
+            $userStmt->execute([$data['user_id']]);
+            $userName = $userStmt->fetchColumn() ?: 'Học viên';
+            
+            // Tạo thông báo
+            $testTypes = ['placement' => 'Đầu vào', 'midterm' => 'Giữa kỳ', 'final' => 'Cuối kỳ', 'mock' => 'Thử'];
+            $testTypeName = $testTypes[$data['test_type'] ?? 'mock'] ?? 'Thử';
+            createAdminNotification(
+                'score',
+                'Điểm mới được cập nhật',
+                "Điểm {$testTypeName} của {$userName}: L:{$data['listening']} R:{$data['reading']} W:{$data['writing']} S:{$data['speaking']} - Overall: {$overall}",
+                $scoreId,
+                'scores'
+            );
+            
             json_response(['success' => true, 'message' => 'Thêm điểm thành công']);
             break;
             
@@ -1748,6 +1811,28 @@ try {
                 $data['id']
             ]);
             
+            // Lấy thông tin điểm số để tạo thông báo
+            $scoreStmt = $pdo->prepare("
+                SELECT s.*, u.fullname 
+                FROM scores s 
+                LEFT JOIN users u ON s.user_id = u.id 
+                WHERE s.id = ?
+            ");
+            $scoreStmt->execute([$data['id']]);
+            $scoreInfo = $scoreStmt->fetch(PDO::FETCH_ASSOC);
+            $userName = $scoreInfo['fullname'] ?? 'Học viên';
+            
+            // Tạo thông báo
+            $testTypes = ['placement' => 'Đầu vào', 'midterm' => 'Giữa kỳ', 'final' => 'Cuối kỳ', 'mock' => 'Thử'];
+            $testTypeName = $testTypes[$data['test_type']] ?? 'Thử';
+            createAdminNotification(
+                'score',
+                'Điểm được cập nhật',
+                "Điểm {$testTypeName} của {$userName} đã được cập nhật: L:{$data['listening']} R:{$data['reading']} W:{$data['writing']} S:{$data['speaking']} - Overall: {$overall}",
+                $data['id'],
+                'scores'
+            );
+            
             json_response(['success' => true, 'message' => 'Cập nhật điểm thành công']);
             break;
             
@@ -1755,7 +1840,15 @@ try {
             $adminId = checkAdmin();
             
             $data = json_decode(file_get_contents('php://input'), true);
+            
+            // Lấy thông tin điểm trước khi xóa
+            $scoreStmt = $pdo->prepare("SELECT s.*, u.fullname FROM scores s LEFT JOIN users u ON s.user_id = u.id WHERE s.id = ?");
+            $scoreStmt->execute([$data['id']]);
+            $scoreInfo = $scoreStmt->fetch(PDO::FETCH_ASSOC);
+            $userName = $scoreInfo['fullname'] ?? 'Học viên';
+            
             moveToTrash('scores', $data['id'], $adminId);
+            createAdminNotification('score', 'Xóa điểm', 'Điểm của "' . $userName . '" đã được chuyển vào thùng rác', $data['id'], 'scores');
             
             json_response(['success' => true, 'message' => 'Đã chuyển vào thùng rác']);
             break;
@@ -1956,8 +2049,33 @@ try {
             $reviewId = $data['id'] ?? 0;
             $isApproved = $data['is_approved'] ?? 1;
             
+            // Kiểm tra giới hạn nếu đang duyệt
+            if ($isApproved == 1) {
+                $approvedCount = countApprovedReviews();
+                $limits = getLimitSettingsExtended();
+                
+                if ($approvedCount >= $limits['max_approved_reviews']) {
+                    json_response([
+                        'success' => false, 
+                        'message' => 'Đã đạt giới hạn ' . $limits['max_approved_reviews'] . ' đánh giá được duyệt. Vui lòng ẩn hoặc xóa một đánh giá khác trước.',
+                        'limit_reached' => true,
+                        'current_count' => $approvedCount,
+                        'max_count' => $limits['max_approved_reviews']
+                    ]);
+                    break;
+                }
+            }
+            
             $stmt = $pdo->prepare("UPDATE reviews SET is_approved = ? WHERE id = ?");
             $stmt->execute([$isApproved, $reviewId]);
+            
+            // Tạo thông báo
+            if ($isApproved) {
+                $stmt2 = $pdo->prepare("SELECT user_name FROM reviews WHERE id = ?");
+                $stmt2->execute([$reviewId]);
+                $review = $stmt2->fetch();
+                createAdminNotification('review', 'Đánh giá đã duyệt', 'Đánh giá từ "' . ($review['user_name'] ?? 'Ẩn danh') . '" đã được duyệt hiển thị', $reviewId, 'reviews');
+            }
             
             json_response(['success' => true, 'message' => $isApproved ? 'Đã duyệt đánh giá' : 'Đã ẩn đánh giá']);
             break;
@@ -1988,6 +2106,7 @@ try {
             // Xóa review
             $stmt = $pdo->prepare("DELETE FROM reviews WHERE id = ?");
             $stmt->execute([$reviewId]);
+            createAdminNotification('review', 'Xóa đánh giá', 'Đánh giá từ "' . ($review['user_name'] ?? 'Ẩn danh') . '" đã bị xóa', $reviewId, 'reviews');
             
             json_response(['success' => true, 'message' => 'Đã xóa đánh giá']);
             break;

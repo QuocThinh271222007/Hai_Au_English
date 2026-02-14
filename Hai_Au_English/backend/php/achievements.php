@@ -12,6 +12,7 @@
 require_once 'config.php';
 require_once 'db.php';
 require_once 'session_config.php';
+require_once 'notifications.php';
 
 // Set CORS headers
 setCorsHeaders();
@@ -123,6 +124,23 @@ function createAchievement() {
     $pdo = getDBConnection();
     
     try {
+        // Kiểm tra giới hạn số thành tích được hiển thị
+        $limitSettings = getLimitSettings();
+        $featuredCount = countFeaturedAchievements();
+        $isFeatured = isset($input['is_featured']) ? 1 : 0;
+        
+        // Nếu admin muốn hiển thị nhưng đã đạt giới hạn - trả về lỗi
+        if ($isFeatured && $featuredCount >= $limitSettings['max_approved_achievements']) {
+            jsonResponse([
+                'success' => false, 
+                'message' => 'Đã đạt giới hạn ' . $limitSettings['max_approved_achievements'] . ' thành tích được hiển thị. Vui lòng xóa hoặc ẩn một thành tích khác trước.',
+                'limit_reached' => true,
+                'current_count' => $featuredCount,
+                'max_count' => $limitSettings['max_approved_achievements']
+            ], 400);
+            return;
+        }
+        
         $stmt = $pdo->prepare("
             INSERT INTO student_achievements 
             (student_name, achievement_title, description, image_url, score, course_name, achievement_date, is_featured, display_order)
@@ -137,16 +155,21 @@ function createAchievement() {
             $input['score'] ?? '',
             $input['course_name'] ?? '',
             $input['achievement_date'] ?? null,
-            isset($input['is_featured']) ? 1 : 0,
+            $isFeatured,
             intval($input['display_order'] ?? 0)
         ]);
         
         $id = $pdo->lastInsertId();
         
+        // Tạo thông báo
+        $notifTitle = $isFeatured ? 'Thành tích mới được thêm' : 'Thành tích mới (Chưa hiển thị)';
+        $notifMessage = "Thành tích \"{$achievementTitle}\" của {$studentName} đã được thêm.";
+        createAdminNotification('achievement', $notifTitle, $notifMessage, $id, 'student_achievements');
+        
         jsonResponse([
             'success' => true,
             'message' => 'Đã thêm thành tích mới',
-            'data' => ['id' => $id]
+            'data' => ['id' => $id, 'is_featured' => $isFeatured]
         ], 201);
         
     } catch (PDOException $e) {
@@ -179,6 +202,31 @@ function updateAchievement() {
     $pdo = getDBConnection();
     
     try {
+        // Kiểm tra giới hạn nếu đang hiển thị (is_featured = 1)
+        if (isset($input['is_featured']) && $input['is_featured'] == 1) {
+            // Lấy trạng thái hiện tại
+            $checkStmt = $pdo->prepare("SELECT is_featured FROM student_achievements WHERE id = ?");
+            $checkStmt->execute([$id]);
+            $current = $checkStmt->fetch();
+            
+            // Chỉ kiểm tra nếu đang chuyển từ ẩn sang hiển thị
+            if ($current && $current['is_featured'] == 0) {
+                $limitSettings = getLimitSettings();
+                $featuredCount = countFeaturedAchievements();
+                
+                if ($featuredCount >= $limitSettings['max_approved_achievements']) {
+                    jsonResponse([
+                        'success' => false, 
+                        'message' => 'Đã đạt giới hạn ' . $limitSettings['max_approved_achievements'] . ' thành tích được hiển thị. Vui lòng ẩn hoặc xóa một thành tích khác trước.',
+                        'limit_reached' => true,
+                        'current_count' => $featuredCount,
+                        'max_count' => $limitSettings['max_approved_achievements']
+                    ], 400);
+                    return;
+                }
+            }
+        }
+        
         // Build dynamic update query
         $updates = [];
         $params = [];
@@ -229,8 +277,8 @@ function deleteAchievement() {
     $pdo = getDBConnection();
     
     try {
-        // Lấy thông tin ảnh để xóa
-        $checkStmt = $pdo->prepare("SELECT image_url FROM student_achievements WHERE id = ?");
+        // Lấy thông tin để xóa
+        $checkStmt = $pdo->prepare("SELECT image_url, student_name, achievement_title FROM student_achievements WHERE id = ?");
         $checkStmt->execute([$id]);
         $achievement = $checkStmt->fetch(PDO::FETCH_ASSOC);
         
@@ -251,6 +299,8 @@ function deleteAchievement() {
         $stmt = $pdo->prepare("DELETE FROM student_achievements WHERE id = ?");
         $stmt->execute([$id]);
         
+        createAdminNotification('achievement', 'Xóa thành tích', 'Thành tích "' . ($achievement['achievement_title'] ?? '') . '" của ' . ($achievement['student_name'] ?? 'học viên') . ' đã bị xóa', $id, 'student_achievements');
+        
         jsonResponse(['success' => true, 'message' => 'Đã xóa thành tích']);
         
     } catch (PDOException $e) {
@@ -262,8 +312,10 @@ function deleteAchievement() {
 /**
  * Kiểm tra quyền admin
  */
-function isAdmin() {
-    return isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+if (!function_exists('isAdmin')) {
+    function isAdmin() {
+        return isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    }
 }
 
 /**

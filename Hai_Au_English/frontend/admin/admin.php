@@ -45,6 +45,30 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
 
                 <!-- User Info -->
                 <div class="flex items-center gap-4">
+                    <!-- Notification Bell -->
+                    <div class="relative" id="notification-container">
+                        <button id="notification-btn" class="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-full transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden">
+                            <div class="p-3 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                <h3 class="font-semibold text-gray-800">Thông báo</h3>
+                                <button id="mark-all-read-btn" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Đánh dấu đã đọc</button>
+                            </div>
+                            <div id="notification-list" class="overflow-y-auto max-h-72">
+                                <div class="p-4 text-center text-gray-500">Đang tải...</div>
+                            </div>
+                            <div class="p-2 border-t border-gray-200 bg-gray-50 text-center">
+                                <button id="view-all-notifications" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Xem tất cả thông báo</button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div id="header-avatar" class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -182,6 +206,14 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
             </div>
 
             <p class="sidebar-section-title">Hệ thống</p>
+
+            <div class="sidebar-menu-item" data-section="notifications">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span>Thông báo</span>
+                <span id="notifications-badge" class="trash-badge hidden">0</span>
+            </div>
 
             <div class="sidebar-menu-item" data-section="trash">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -395,52 +427,83 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
             <div class="profile-card">
                 <div class="profile-card-header">
                     <h2 class="profile-card-title">Quản lý đăng ký khóa học</h2>
-                    <button id="add-enrollment-btn" class="admin-action-btn primary">+ Thêm đăng ký</button>
                 </div>
-                <!-- Search Bar and Filter -->
-                <div class="flex flex-wrap gap-4 mb-4">
-                    <div class="search-bar-container flex-1 min-w-[250px]">
-                        <div class="relative">
-                            <input type="text" id="search-enrollments" class="profile-form-input pl-10" placeholder="Tìm kiếm theo tên, email hoặc mã số học viên...">
-                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <button id="clear-search-enrollments" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
+                
+                <!-- Info Banner -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-blue-700 text-sm">
+                            Học viên tự đăng ký khóa học từ trang Khóa học. Click vào từng khóa để xem danh sách học viên đã đăng ký.
+                        </p>
                     </div>
-                    <select id="enrollment-status-filter" class="profile-form-input" style="max-width: 200px;">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="pending">Chờ xử lý</option>
-                        <option value="active">Đang học</option>
-                        <option value="completed">Hoàn thành</option>
-                        <option value="cancelled">Đã hủy</option>
+                </div>
+                
+                <!-- Filter -->
+                <div class="flex flex-wrap gap-4 mb-4">
+                    <select id="enrollment-course-status-filter" class="profile-form-input" style="max-width: 200px;">
+                        <option value="">Tất cả khóa học</option>
+                        <option value="open" selected>Đang mở đăng ký</option>
+                        <option value="closed">Đã đóng</option>
+                    </select>
+                    <select id="enrollment-category-filter" class="profile-form-input" style="max-width: 200px;">
+                        <option value="">Tất cả danh mục</option>
+                        <option value="tieuhoc">Tiểu học</option>
+                        <option value="thcs">THCS</option>
+                        <option value="ielts">IELTS</option>
                     </select>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="profile-table">
-                        <thead>
-                            <tr>
-                                <th>Học viên</th>
-                                <th>Khóa học</th>
-                                <th>Năm học</th>
-                                <th>Học kỳ</th>
-                                <th>Tiến độ</th>
-                                <th>Trạng thái</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="enrollments-tbody">
-                            <tr>
-                                <td colspan="7" class="text-center py-8">
-                                    <div class="spinner"></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Courses Grid -->
+                <div id="enrollment-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="col-span-full text-center py-8">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enrolled Students Modal -->
+            <div id="enrolled-students-modal" class="admin-modal hidden">
+                <div class="admin-modal-content" style="max-width: 800px;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800" id="enrolled-modal-title">Danh sách học viên đăng ký</h3>
+                        <button class="close-enrolled-modal text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Course Info -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="flex items-center gap-4">
+                            <img id="enrolled-course-image" src="" alt="" class="w-20 h-14 object-cover rounded">
+                            <div>
+                                <h4 id="enrolled-course-name" class="font-semibold text-gray-800"></h4>
+                                <p id="enrolled-course-info" class="text-sm text-gray-600"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Students Table -->
+                    <div class="overflow-x-auto max-h-96">
+                        <table class="profile-table w-full">
+                            <thead class="sticky top-0 bg-white">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Học viên</th>
+                                    <th>Email</th>
+                                    <th>Ngày đăng ký</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="enrolled-students-tbody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2200,6 +2263,70 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                             <tr><td colspan="7" class="text-center py-8 text-gray-500">Đang tải...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notifications Section (Thông báo) -->
+        <section id="section-notifications" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title">Thông báo hệ thống</h2>
+                    <div class="flex gap-2">
+                        <select id="notifications-type-filter" class="profile-form-input" style="max-width: 180px;">
+                            <option value="">Tất cả loại</option>
+                            <option value="review">Đánh giá</option>
+                            <option value="achievement">Thành tích</option>
+                            <option value="score">Điểm số</option>
+                            <option value="contact">Liên hệ</option>
+                            <option value="user">Người dùng</option>
+                            <option value="system">Hệ thống</option>
+                        </select>
+                        <button id="mark-all-notifications-read" class="admin-action-btn secondary">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Đánh dấu tất cả đã đọc
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="alert-info mb-4" style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px;">
+                    <p class="text-sm text-blue-800">
+                        <strong>ℹ️ Thông tin:</strong> Thông báo giúp bạn theo dõi các hoạt động mới như đánh giá, điểm số, liên hệ từ học viên.
+                        <br>
+                        <span class="text-xs mt-1 block">• Giới hạn hiển thị: <strong id="max-reviews-display">20</strong> đánh giá | <strong id="max-achievements-display">20</strong> thành tích</span>
+                    </p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="profile-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">STT</th>
+                                <th style="width: 100px;">Loại</th>
+                                <th style="width: 200px;">Tiêu đề</th>
+                                <th>Nội dung</th>
+                                <th style="width: 80px;">Trạng thái</th>
+                                <th style="width: 150px;">Thời gian</th>
+                                <th style="width: 100px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notifications-tbody">
+                            <tr>
+                                <td colspan="7" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div id="notifications-pagination" class="flex justify-center items-center gap-4 mt-4">
+                    <button id="notif-prev-page" class="admin-action-btn secondary" disabled>← Trước</button>
+                    <span id="notif-page-info" class="text-gray-600">Trang 1 / 1</span>
+                    <button id="notif-next-page" class="admin-action-btn secondary" disabled>Tiếp →</button>
                 </div>
             </div>
         </section>
