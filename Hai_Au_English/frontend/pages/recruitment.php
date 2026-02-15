@@ -96,7 +96,7 @@ require_once __DIR__ . '/../components/content_helper.php';
         <div class="absolute inset-0 bg-black/20"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-3xl mx-auto text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Cơ hội nghề nghiệp</h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4" style="padding-top: 7rem">Cơ hội nghề nghiệp</h1>
                 <p class="text-xl text-blue-100 mb-8">
                     Gia nhập đội ngũ Hải Âu English - Nơi bạn có thể phát triển sự nghiệp và đam mê giảng dạy
                 </p>
