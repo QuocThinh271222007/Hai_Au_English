@@ -54,6 +54,7 @@ $paths = [
 // Đường dẫn assets (CSS, JS, images)
 $assetsPath = $basePath . '/frontend';
 
-// Đường dẫn API backend
+// Đường dẫn API backend (cả hai tên để tương thích)
 $apiPath = $basePath . '/backend/php';
+$apiBase = $apiPath;  // Alias cho tương thích với các trang cũ
 ?>

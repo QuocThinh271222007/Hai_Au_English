@@ -9,85 +9,111 @@ require_once __DIR__ . '/../components/content_helper.php';
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <?php include __DIR__ . '/../components/head.php'; ?>
     <style>
-        .job-card {
-            transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
-        }
-        .job-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-            border-color: #3b82f6;
-        }
-        .job-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .badge-featured {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
-        }
-        .badge-fulltime { background: #dcfce7; color: #166534; }
-        .badge-parttime { background: #e0f2fe; color: #0369a1; }
-        .badge-contract { background: #fef3c7; color: #92400e; }
-        .badge-intern { background: #f3e8ff; color: #7c3aed; }
-        
-        .job-detail-content h4 {
-            color: #1f2937;
-            font-weight: 600;
-            margin-top: 20px;
-            margin-bottom: 12px;
-        }
-        .job-detail-content ul {
-            list-style: none;
-            padding: 0;
-        }
-        .job-detail-content li {
-            position: relative;
-            padding-left: 24px;
-            margin-bottom: 8px;
-            color: #4b5563;
-        }
-        .job-detail-content li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #22c55e;
-            font-weight: bold;
-        }
-        
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-backdrop.active {
-            display: flex;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+    .job-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        border-color: #3b82f6;
+    }
+
+    .job-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .badge-featured {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+
+    .badge-fulltime {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-parttime {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .badge-contract {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-intern {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .job-detail-content h4 {
+        color: #1f2937;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 12px;
+    }
+
+    .job-detail-content ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .job-detail-content li {
+        position: relative;
+        padding-left: 24px;
+        margin-bottom: 8px;
+        color: #4b5563;
+    }
+
+    .job-detail-content li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #22c55e;
+        font-weight: bold;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .modal-backdrop.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 800px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <?php include __DIR__ . '/../components/header.php'; ?>
 
@@ -117,16 +143,24 @@ require_once __DIR__ . '/../components/content_helper.php';
             <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
                 <div class="flex flex-wrap gap-4 items-center justify-between">
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="filterJobs('all')" class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition-colors" data-filter="all">
+                        <button onclick="filterJobs('all')"
+                            class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            data-filter="all">
                             Tất cả
                         </button>
-                        <button onclick="filterJobs('full-time')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors" data-filter="full-time">
+                        <button onclick="filterJobs('full-time')"
+                            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            data-filter="full-time">
                             Toàn thời gian
                         </button>
-                        <button onclick="filterJobs('part-time')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors" data-filter="part-time">
+                        <button onclick="filterJobs('part-time')"
+                            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            data-filter="part-time">
                             Bán thời gian
                         </button>
-                        <button onclick="filterJobs('intern')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors" data-filter="intern">
+                        <button onclick="filterJobs('intern')"
+                            class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            data-filter="intern">
                             Thực tập
                         </button>
                     </div>
@@ -140,7 +174,9 @@ require_once __DIR__ . '/../components/content_helper.php';
             <div id="jobs-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Jobs will be loaded here -->
                 <div class="col-span-full text-center py-12">
-                    <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <div
+                        class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4">
+                    </div>
                     <p class="text-gray-500">Đang tải danh sách tuyển dụng...</p>
                 </div>
             </div>
@@ -148,7 +184,8 @@ require_once __DIR__ . '/../components/content_helper.php';
             <!-- Empty State -->
             <div id="empty-state" class="hidden text-center py-16">
                 <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Chưa có vị trí tuyển dụng</h3>
                 <p class="text-gray-500">Vui lòng quay lại sau hoặc gửi CV cho chúng tôi qua email</p>
@@ -164,16 +201,19 @@ require_once __DIR__ . '/../components/content_helper.php';
                 <div class="text-center">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <h3 class="font-semibold text-lg mb-2">Thu nhập hấp dẫn</h3>
-                    <p class="text-gray-600 text-sm">Mức lương cạnh tranh cùng các khoản thưởng theo hiệu quả công việc</p>
+                    <p class="text-gray-600 text-sm">Mức lương cạnh tranh cùng các khoản thưởng theo hiệu quả công việc
+                    </p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                     </div>
                     <h3 class="font-semibold text-lg mb-2">Cơ hội phát triển</h3>
@@ -182,7 +222,8 @@ require_once __DIR__ . '/../components/content_helper.php';
                 <div class="text-center">
                     <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
                     <h3 class="font-semibold text-lg mb-2">Môi trường năng động</h3>
@@ -191,7 +232,8 @@ require_once __DIR__ . '/../components/content_helper.php';
                 <div class="text-center">
                     <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </div>
                     <h3 class="font-semibold text-lg mb-2">Phúc lợi đầy đủ</h3>
@@ -208,10 +250,11 @@ require_once __DIR__ . '/../components/content_helper.php';
             <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
                 Gửi CV của bạn về email của chúng tôi. Chúng tôi sẽ liên hệ khi có vị trí phù hợp!
             </p>
-            <a href="mailto:haiauenglish@gmail.com?subject=Ứng tuyển - Hải Âu English" 
-               class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-colors">
+            <a href="mailto:haiauenglish@gmail.com?subject=Ứng tuyển - Hải Âu English"
+                class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 Gửi CV ngay
             </a>
@@ -225,7 +268,8 @@ require_once __DIR__ . '/../components/content_helper.php';
                 <h3 class="text-xl font-bold text-gray-800" id="modal-title">Chi tiết công việc</h3>
                 <button onclick="closeJobModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -254,7 +298,7 @@ require_once __DIR__ . '/../components/content_helper.php';
             try {
                 const res = await fetch(API + '?action=list&active=1');
                 const data = await res.json();
-                
+
                 if (data.success) {
                     allJobs = data.data;
                     document.getElementById('total-jobs').textContent = data.pagination.total;
@@ -273,17 +317,17 @@ require_once __DIR__ . '/../components/content_helper.php';
         function renderJobs(jobs) {
             const container = document.getElementById('jobs-container');
             const emptyState = document.getElementById('empty-state');
-            
+
             if (jobs.length === 0) {
                 container.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 document.getElementById('showing-count').textContent = '0';
                 return;
             }
-            
+
             emptyState.classList.add('hidden');
             document.getElementById('showing-count').textContent = jobs.length;
-            
+
             container.innerHTML = jobs.map(job => `
                 <div class="job-card bg-white rounded-xl p-6 cursor-pointer" onclick="openJobDetail(${job.id})">
                     <div class="flex items-start justify-between mb-4">
@@ -333,7 +377,7 @@ require_once __DIR__ . '/../components/content_helper.php';
 
         window.filterJobs = function(type) {
             currentFilter = type;
-            
+
             // Update button styles
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active', 'bg-blue-600', 'text-white');
@@ -342,31 +386,32 @@ require_once __DIR__ . '/../components/content_helper.php';
             const activeBtn = document.querySelector(`.filter-btn[data-filter="${type}"]`);
             activeBtn.classList.add('active', 'bg-blue-600', 'text-white');
             activeBtn.classList.remove('bg-gray-100', 'text-gray-700', 'hover:bg-gray-200');
-            
+
             // Filter jobs
-            const filtered = type === 'all' 
-                ? allJobs 
-                : allJobs.filter(job => job.employment_type === type);
-            
+            const filtered = type === 'all' ?
+                allJobs :
+                allJobs.filter(job => job.employment_type === type);
+
             renderJobs(filtered);
         };
 
         window.openJobDetail = async function(id) {
             const modal = document.getElementById('job-modal');
             const modalBody = document.getElementById('modal-body');
-            
-            modalBody.innerHTML = '<div class="text-center py-8"><div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div></div>';
+
+            modalBody.innerHTML =
+                '<div class="text-center py-8"><div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div></div>';
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
+
             try {
                 const res = await fetch(API + '?action=detail&id=' + id);
                 const data = await res.json();
-                
+
                 if (data.success) {
                     const job = data.data;
                     document.getElementById('modal-title').textContent = job.title;
-                    
+
                     modalBody.innerHTML = `
                         <div class="job-detail-content">
                             <!-- Header Info -->
@@ -382,7 +427,6 @@ require_once __DIR__ . '/../components/content_helper.php';
                                 ${job.salary_range ? `<div><strong>Mức lương:</strong> ${job.salary_range}</div>` : ''}
                                 ${job.experience ? `<div><strong>Kinh nghiệm:</strong> ${job.experience}</div>` : ''}
                                 ${job.deadline_formatted ? `<div><strong>Hạn nộp:</strong> ${job.deadline_formatted}</div>` : ''}
-                                <div><strong>Lượt xem:</strong> ${job.view_count}</div>
                             </div>
                             
                             <!-- Description -->
@@ -447,4 +491,5 @@ require_once __DIR__ . '/../components/content_helper.php';
     })();
     </script>
 </body>
+
 </html>

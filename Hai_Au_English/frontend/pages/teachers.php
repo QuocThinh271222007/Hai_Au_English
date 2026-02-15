@@ -65,7 +65,7 @@ $content = getSiteContent('teachers');
                 </div>
 
                 <!-- Dynamic Teachers Grid - loaded from database -->
-                <div id="teachers-grid" class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div id="teachers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-w-5xl mx-auto">
                     <!-- Teachers will be loaded dynamically by teachers.js -->
                     <div class="col-span-full text-center py-8">
                         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

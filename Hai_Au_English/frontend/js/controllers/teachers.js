@@ -27,34 +27,22 @@ function formatTime(timeStr) {
 document.addEventListener('DOMContentLoaded', function() {
   const teachersGrid = document.getElementById('teachers-grid');
   
-  // Render một teacher card
+  // Render một teacher card - Compact circular avatar design
   function renderTeacherCard(teacher) {
     const specialties = Array.isArray(teacher.specialties) ? teacher.specialties : [];
     const imageUrl = getImageUrl(teacher.image_url);
+    // Get qualification text from title or use default
+    const qualification = teacher.title || 'Giảng viên';
     
     return `
       <div class="teacher-card" data-teacher-id="${teacher.id}">
-        <!-- TODO: Bật lại chức năng xem lịch dạy sau khi hoàn thiện backend
-        <div class="teacher-image" style="cursor:pointer" onclick="window.showTeacherSchedule(${teacher.id}, '${teacher.name.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}')">
-        -->
         <div class="teacher-image">
           <img src="${imageUrl}" alt="${teacher.name}" onerror="this.src='${BASE_PATH}/frontend/assets/images/default-avatar.svg'">
-          <!-- TODO: Tạm ẩn IELTS badge - bật lại khi cần
-          <div class="teacher-badge">${teacher.ielts_score} IELTS</div>
-          -->
-          <!-- TODO: Bật lại overlay xem lịch dạy sau
-          <div class="teacher-overlay">
-            <span class="view-schedule-btn">📅 Xem lịch dạy</span>
-          </div>
-          -->
         </div>
         <div class="teacher-content">
-          <!-- TODO: Bật lại onclick xem lịch dạy sau
-          <h3 class="teacher-name" style="cursor:pointer" onclick="window.showTeacherSchedule(${teacher.id}, '${teacher.name.replace(/'/g, "\\'")}', '${imageUrl.replace(/'/g, "\\'")}')">${teacher.name}</h3>
-          -->
           <h3 class="teacher-name">${teacher.name}</h3>
-          <p class="teacher-title">${teacher.title}</p>
-          <!-- <p class="teacher-description">${teacher.description}</p> -->
+          <p class="teacher-title">${qualification}</p>
+          <a href="#" class="teacher-link" onclick="event.preventDefault();">Xem thông tin <span class="teacher-link-arrow">→</span></a>
         </div>
       </div>
     `;

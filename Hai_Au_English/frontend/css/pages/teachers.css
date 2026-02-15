@@ -1,31 +1,38 @@
 /* Teachers Page Specific Styles */
 
-/* Teacher Cards */
+/* Teacher Cards - Compact Circular Avatar Design */
 .teacher-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
     background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    max-width: 100%;
+    margin: 0;
 }
 
 .teacher-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    background: #fef7f7;
 }
 
 .teacher-image {
     position: relative;
-    width: 100%;
-    height: 300px;
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 50%;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 3px solid #dc2626;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
 }
 
 .teacher-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top;
     transition: transform 0.3s ease;
 }
 
@@ -34,35 +41,47 @@
 }
 
 .teacher-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    display: none;
 }
 
 .teacher-content {
-    padding: 24px;
+    flex: 1;
+    padding: 0;
 }
 
 .teacher-name {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 600;
     color: #1f2937;
     margin-bottom: 4px;
+    line-height: 1.3;
 }
 
 .teacher-title {
-    color: #3b82f6;
-    font-weight: 600;
-    margin-bottom: 12px;
+    color: #4b5563;
+    font-weight: 400;
+    margin-bottom: 8px;
     font-size: 14px;
-    text-transform: uppercase;
+    text-transform: none;
+}
+
+.teacher-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.teacher-link:hover {
+    gap: 10px;
+}
+
+.teacher-link-arrow {
+    transition: transform 0.2s ease;
 }
 
 .teacher-description {
@@ -464,12 +483,23 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .teacher-card {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
     .teacher-image {
-        height: 250px;
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
     }
 
     .teacher-name {
-        font-size: 20px;
+        font-size: 15px;
+    }
+
+    .teacher-title {
+        font-size: 13px;
     }
 
     .teacher-stats {
@@ -481,7 +511,30 @@
     .testimonial-card {
         padding: 24px;
     }
-    .gap-4{
-        gap: 2rem !important; 
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .teacher-card {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+    
+    .teacher-image {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+    }
+
+    .teacher-name {
+        font-size: 14px;
+    }
+
+    .teacher-title {
+        font-size: 12px;
+    }
+
+    .teacher-link {
+        font-size: 13px;
     }
 }
