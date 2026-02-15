@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Central Configuration File for Hai Au English Backend
  * 
@@ -18,12 +19,13 @@ define('HAI_AU_CONFIG_LOADED', true);
 // TỰ ĐỘNG DETECT MÔI TRƯỜNG (XAMPP vs HOSTINGER)
 // ============================================
 
-function isLocalhost() {
+function isLocalhost()
+{
     $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-    return (strpos($host, 'localhost') !== false || 
-            strpos($host, '127.0.0.1') !== false ||
-            strpos($host, 'haiauenglish_test.edu.vn') !== false ||
-            strpos($host, 'haiauenglish-test.edu.vn') !== false);
+    return (strpos($host, 'localhost') !== false ||
+        strpos($host, '127.0.0.1') !== false ||
+        strpos($host, 'haiauenglish_test.edu.vn') !== false ||
+        strpos($host, 'haiauenglish-test.edu.vn') !== false);
 }
 
 // ============================================
@@ -49,14 +51,15 @@ if (isLocalhost()) {
 // ============================================
 
 // Tự động detect domain từ request
-function getOrigin() {
+function getOrigin()
+{
     if (isset($_SERVER['HTTP_ORIGIN'])) {
         return $_SERVER['HTTP_ORIGIN'];
     }
-    
+
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    
+
     return $protocol . '://' . $host;
 }
 
@@ -72,20 +75,21 @@ define('ALLOWED_ORIGINS', [
 ]);
 
 // Lấy frontend URL cho CORS
-function getFrontendUrl() {
+function getFrontendUrl()
+{
     $origin = getOrigin();
-    
+
     // Nếu origin trong whitelist, cho phép
     if (in_array($origin, ALLOWED_ORIGINS)) {
         return $origin;
     }
-    
+
     // Kiểm tra xem có phải cùng domain không
     $host = $_SERVER['HTTP_HOST'] ?? '';
     if (strpos($origin, $host) !== false) {
         return $origin;
     }
-    
+
     // Default: production domain
     return 'https://haiauenglish.edu.vn';
 }
@@ -97,17 +101,18 @@ define('FRONTEND_URL', getFrontendUrl());
 // ============================================
 
 // Cookie domain - để trống để tự động detect
-function getCookieDomain() {
+function getCookieDomain()
+{
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    
+
     // Localhost không cần domain
     if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
         return '';
     }
-    
+
     // Loại bỏ port nếu có
     $host = preg_replace('/:\d+$/', '', $host);
-    
+
     // Thêm dấu chấm phía trước để áp dụng cho subdomain
     return '.' . $host;
 }
@@ -121,6 +126,14 @@ define('COOKIE_DOMAIN', getCookieDomain());
 define('ADMIN_EMAIL', 'admin@haiauenglish.edu.vn');  // Email nhận thông báo
 define('ADMIN_NAME', 'Hải Âu English');
 
+// SMTP (send email)
+define('SMTP_USERNAME', 'haiauenglish@gmail.com');
+define('SMTP_SECRET', 'pzglabqcxoqiapmo');
+define('SMTP_HOST', 'smtp.gmail.com');
+
+// quan trọng (người nhận mail)
+define('SHOP_OWNER', 'haiauenglish@gmail.com');
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -128,13 +141,14 @@ define('ADMIN_NAME', 'Hải Âu English');
 /**
  * Set CORS headers - gọi ở đầu mỗi API endpoint
  */
-function setCorsHeaders() {
+function setCorsHeaders()
+{
     header('Content-Type: application/json; charset=utf-8');
     header('Access-Control-Allow-Origin: ' . FRONTEND_URL);
     header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
-    
+
     // Handle preflight
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(200);
@@ -147,7 +161,8 @@ function setCorsHeaders() {
  * Wrapped in function_exists to avoid conflicts with API-specific implementations
  */
 if (!function_exists('jsonResponse')) {
-    function jsonResponse($data, $statusCode = 200) {
+    function jsonResponse($data, $statusCode = 200)
+    {
         http_response_code($statusCode);
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
@@ -158,7 +173,8 @@ if (!function_exists('jsonResponse')) {
  * Error response helper
  */
 if (!function_exists('errorResponse')) {
-    function errorResponse($message, $statusCode = 400) {
+    function errorResponse($message, $statusCode = 400)
+    {
         http_response_code($statusCode);
         echo json_encode(['success' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
         exit;
@@ -169,7 +185,8 @@ if (!function_exists('errorResponse')) {
  * Success response helper
  */
 if (!function_exists('successResponse')) {
-    function successResponse($data = [], $message = 'Success') {
+    function successResponse($data = [], $message = 'Success')
+    {
         $response = ['success' => true, 'message' => $message];
         if (!empty($data)) {
             $response = array_merge($response, $data);
