@@ -232,6 +232,13 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                 <span>Quản lý nội dung</span>
             </div>
 
+            <div class="sidebar-menu-item" data-section="recruitment">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span>Tuyển dụng</span>
+            </div>
+
             <p class="sidebar-section-title">Cài đặt</p>
 
             <div class="sidebar-menu-item" data-section="settings">
@@ -649,7 +656,9 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                                 <th>Họ tên</th>
                                 <th>Chuyên môn</th>
                                 <th>Kinh nghiệm</th>
+                                <!-- TODO: Tạm ẩn IELTS - bật lại khi cần
                                 <th>IELTS</th>
+                                -->
                                 <th>Trạng thái</th>
                                 <th>Thao tác</th>
                             </tr>
@@ -2384,6 +2393,59 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                 </div>
             </div>
         </section>
+
+        <!-- Recruitment Management Section -->
+        <section id="section-recruitment" class="content-section">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <h2 class="profile-card-title flex items-center gap-2">
+                        <span class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </span>
+                        Quản lý Tuyển dụng
+                    </h2>
+                    <button class="admin-action-btn primary" id="add-recruitment-btn">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Thêm tin tuyển dụng
+                    </button>
+                </div>
+
+                <div class="alert-info mb-4" style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px;">
+                    <p class="text-sm text-blue-800">
+                        <strong>💡 Gợi ý:</strong> Quản lý các tin tuyển dụng hiển thị trên trang <a href="<?php echo $basePath; ?>/TuyenDung" target="_blank" class="underline">Tuyển dụng</a>. Có thể bật/tắt hiển thị và đánh dấu tin nổi bật.
+                    </p>
+                </div>
+
+                <!-- Recruitments Table -->
+                <div class="overflow-x-auto">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Vị trí</th>
+                                <th>Phòng ban</th>
+                                <th>Loại hình</th>
+                                <th>Mức lương</th>
+                                <th>Hạn nộp</th>
+                                <th>Trạng thái</th>
+                                <th>Nổi bật</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recruitment-tbody">
+                            <tr>
+                                <td colspan="8" class="text-center py-8">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Modal Container -->
@@ -2586,6 +2648,309 @@ $additionalCss = ['/frontend/css/pages/profile.css'];
                 }
             });
         });
+    </script>
+
+    <!-- Recruitment Management Script -->
+    <script>
+    (function() {
+        const basePath = '<?php echo $basePath; ?>';
+        const RECRUITMENT_API = basePath + '/backend/php/recruitment.php';
+        
+        // Employment type labels
+        const employmentTypes = {
+            'full-time': 'Toàn thời gian',
+            'part-time': 'Bán thời gian',
+            'contract': 'Hợp đồng',
+            'intern': 'Thực tập'
+        };
+
+        // Load recruitments when section is shown
+        document.addEventListener('DOMContentLoaded', function() {
+            const recruitmentSection = document.getElementById('section-recruitment');
+            if (recruitmentSection) {
+                loadRecruitments();
+            }
+
+            // Add recruitment button
+            const addBtn = document.getElementById('add-recruitment-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', () => showRecruitmentModal());
+            }
+        });
+
+        // Load recruitments list
+        async function loadRecruitments() {
+            const tbody = document.getElementById('recruitment-tbody');
+            if (!tbody) return;
+
+            try {
+                const res = await fetch(RECRUITMENT_API + '?action=admin_list', { credentials: 'include' });
+                const data = await res.json();
+
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(job => `
+                        <tr>
+                            <td>
+                                <div class="font-medium">${escapeHtml(job.title)}</div>
+                                <div class="text-xs text-gray-500">${job.location}</div>
+                            </td>
+                            <td>${job.department || '-'}</td>
+                            <td><span class="badge-${job.employment_type.replace('-', '')}">${job.employment_type_label}</span></td>
+                            <td>${job.salary_range || '-'}</td>
+                            <td>${job.deadline ? new Date(job.deadline).toLocaleDateString('vi-VN') : 'Không giới hạn'}</td>
+                            <td>
+                                <button onclick="toggleRecruitmentStatus(${job.id}, 'is_active')" class="px-2 py-1 rounded text-xs font-medium ${job.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                                    ${job.is_active ? 'Đang tuyển' : 'Tạm dừng'}
+                                </button>
+                            </td>
+                            <td>
+                                <button onclick="toggleRecruitmentStatus(${job.id}, 'is_featured')" class="px-2 py-1 rounded text-xs font-medium ${job.is_featured ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}">
+                                    ${job.is_featured ? '⭐ Nổi bật' : 'Thường'}
+                                </button>
+                            </td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <button onclick="editRecruitment(${job.id})" class="admin-action-btn text-blue-600 hover:bg-blue-50 p-1" title="Sửa">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteRecruitment(${job.id}, '${escapeHtml(job.title)}')" class="admin-action-btn text-red-600 hover:bg-red-50 p-1" title="Xóa">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-500">Chưa có tin tuyển dụng nào</td></tr>';
+                }
+            } catch (err) {
+                console.error('Error loading recruitments:', err);
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-red-500">Lỗi tải dữ liệu</td></tr>';
+            }
+        }
+
+        // Show recruitment modal (add/edit)
+        window.showRecruitmentModal = async function(jobId = null) {
+            let job = null;
+            
+            if (jobId) {
+                try {
+                    const res = await fetch(RECRUITMENT_API + '?action=detail&id=' + jobId, { credentials: 'include' });
+                    const data = await res.json();
+                    if (data.success) job = data.data;
+                } catch (err) {
+                    showToast('Lỗi tải dữ liệu', 'error');
+                    return;
+                }
+            }
+
+            const modal = document.getElementById('modal-container');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalContent.innerHTML = `
+                <div class="flex justify-between items-center mb-4 pb-4 border-b">
+                    <h3 class="text-xl font-bold">${job ? 'Sửa tin tuyển dụng' : 'Thêm tin tuyển dụng'}</h3>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <form id="recruitment-form" class="space-y-4">
+                    <input type="hidden" name="id" value="${job ? job.id : ''}">
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tiêu đề vị trí *</label>
+                            <input type="text" name="title" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="${job ? escapeHtml(job.title) : ''}" placeholder="VD: Giảng viên Tiếng Anh IELTS">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Phòng ban</label>
+                            <input type="text" name="department" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.department || '') : ''}" placeholder="VD: Giảng dạy">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Địa điểm</label>
+                            <input type="text" name="location" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.location) : 'TP. Hồ Chí Minh'}" placeholder="TP. Hồ Chí Minh">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Loại hình</label>
+                            <select name="employment_type" class="w-full px-3 py-2 border rounded-lg">
+                                <option value="full-time" ${job && job.employment_type === 'full-time' ? 'selected' : ''}>Toàn thời gian</option>
+                                <option value="part-time" ${job && job.employment_type === 'part-time' ? 'selected' : ''}>Bán thời gian</option>
+                                <option value="contract" ${job && job.employment_type === 'contract' ? 'selected' : ''}>Hợp đồng</option>
+                                <option value="intern" ${job && job.employment_type === 'intern' ? 'selected' : ''}>Thực tập</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Mức lương</label>
+                            <input type="text" name="salary_range" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.salary_range || '') : ''}" placeholder="VD: 15-25 triệu">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Yêu cầu kinh nghiệm</label>
+                            <input type="text" name="experience" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.experience || '') : ''}" placeholder="VD: Tối thiểu 2 năm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Hạn nộp hồ sơ</label>
+                            <input type="date" name="deadline" class="w-full px-3 py-2 border rounded-lg" value="${job && job.deadline ? job.deadline.split(' ')[0] : ''}">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Mô tả công việc (có thể dùng HTML)</label>
+                        <textarea name="description" rows="4" class="w-full px-3 py-2 border rounded-lg" placeholder="<h4>Mô tả:</h4><ul><li>Nội dung...</li></ul>">${job ? job.description || '' : ''}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Yêu cầu ứng viên (có thể dùng HTML)</label>
+                        <textarea name="requirements" rows="4" class="w-full px-3 py-2 border rounded-lg">${job ? job.requirements || '' : ''}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Quyền lợi (có thể dùng HTML)</label>
+                        <textarea name="benefits" rows="4" class="w-full px-3 py-2 border rounded-lg">${job ? job.benefits || '' : ''}</textarea>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Email liên hệ</label>
+                            <input type="email" name="contact_email" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.contact_email) : 'haiauenglish@gmail.com'}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Số điện thoại liên hệ</label>
+                            <input type="text" name="contact_phone" class="w-full px-3 py-2 border rounded-lg" value="${job ? escapeHtml(job.contact_phone) : '0931 828 960'}">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" name="is_active" ${!job || job.is_active ? 'checked' : ''} class="w-4 h-4">
+                            <span>Đang tuyển</span>
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" name="is_featured" ${job && job.is_featured ? 'checked' : ''} class="w-4 h-4">
+                            <span>⭐ Tin nổi bật</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-end gap-2 pt-4 border-t">
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Hủy</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            ${job ? 'Cập nhật' : 'Tạo tin'}
+                        </button>
+                    </div>
+                </form>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Handle form submit
+            document.getElementById('recruitment-form').onsubmit = async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                data.is_active = form.is_active.checked ? 1 : 0;
+                data.is_featured = form.is_featured.checked ? 1 : 0;
+                
+                const action = data.id ? 'update' : 'create';
+                
+                try {
+                    const res = await fetch(RECRUITMENT_API + '?action=' + action, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(data)
+                    });
+                    const result = await res.json();
+                    
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        closeModal();
+                        loadRecruitments();
+                    } else {
+                        showToast(result.error || 'Có lỗi xảy ra', 'error');
+                    }
+                } catch (err) {
+                    showToast('Lỗi kết nối', 'error');
+                }
+            };
+        };
+
+        // Edit recruitment
+        window.editRecruitment = function(id) {
+            showRecruitmentModal(id);
+        };
+
+        // Delete recruitment
+        window.deleteRecruitment = async function(id, title) {
+            if (!confirm(`Bạn có chắc muốn xóa tin "${title}"?`)) return;
+            
+            try {
+                const res = await fetch(RECRUITMENT_API + '?action=delete&id=' + id, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showToast('Đã xóa tin tuyển dụng', 'success');
+                    loadRecruitments();
+                } else {
+                    showToast(data.error || 'Lỗi xóa', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối', 'error');
+            }
+        };
+
+        // Toggle status
+        window.toggleRecruitmentStatus = async function(id, field) {
+            try {
+                const res = await fetch(RECRUITMENT_API + '?action=toggle_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ id, field })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    loadRecruitments();
+                } else {
+                    showToast(data.error || 'Lỗi cập nhật', 'error');
+                }
+            } catch (err) {
+                showToast('Lỗi kết nối', 'error');
+            }
+        };
+
+        // Close modal
+        window.closeModal = function() {
+            const modal = document.getElementById('modal-container');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        // Escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Expose loadRecruitments globally
+        window.loadRecruitments = loadRecruitments;
+    })();
     </script>
     
     <script type="module" src="<?php echo $assetsPath; ?>/js/controllers/admin.js"></script>

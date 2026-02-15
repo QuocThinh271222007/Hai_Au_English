@@ -29,6 +29,9 @@ if (!isset($basePath)) {
                     <a href="<?php echo $paths['teachers']; ?>" class="<?php echo ($currentPage == 'teachers') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'; ?> font-medium transition-colors">
                         Giảng viên
                     </a>
+                    <a href="<?php echo $paths['recruitment']; ?>" class="<?php echo ($currentPage == 'recruitment') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'; ?> font-medium transition-colors">
+                        Tuyển dụng
+                    </a>
                     <a href="<?php echo $paths['contact']; ?>" class="<?php echo ($currentPage == 'contact') ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'; ?> font-medium transition-colors">
                         Liên hệ
                     </a>
@@ -91,6 +94,9 @@ if (!isset($basePath)) {
                 </a>
                 <a href="<?php echo $paths['teachers']; ?>" class="block py-2 <?php echo ($currentPage == 'teachers') ? 'text-blue-600 bg-blue-50 px-3 rounded' : 'text-gray-700 hover:text-blue-600'; ?> font-medium">
                     Giảng viên
+                </a>
+                <a href="<?php echo $paths['recruitment']; ?>" class="block py-2 <?php echo ($currentPage == 'recruitment') ? 'text-blue-600 bg-blue-50 px-3 rounded' : 'text-gray-700 hover:text-blue-600'; ?> font-medium">
+                    Tuyển dụng
                 </a>
                 <a href="<?php echo $paths['contact']; ?>" class="block py-2 <?php echo ($currentPage == 'contact') ? 'text-blue-600 bg-blue-50 px-3 rounded' : 'text-gray-700 hover:text-blue-600'; ?> font-medium">
                     Liên hệ

@@ -94,7 +94,7 @@ require_once __DIR__ . '/../components/base_config.php';
                             <input type="checkbox" id="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="ml-2 text-sm text-gray-600">Ghi nhớ đăng nhập</span>
                         </label>
-                        <a href="#" class="text-sm text-blue-600 hover:text-blue-700">
+                        <a href="<?php echo $basePath; ?>/QuenMatKhau" class="text-sm text-blue-600 hover:text-blue-700">
                             Quên mật khẩu?
                         </a>
                     </div>

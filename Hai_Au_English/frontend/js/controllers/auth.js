@@ -169,14 +169,70 @@
         e.preventDefault();
         var submitBtn = document.getElementById('signup-submit-btn') || sf.querySelector('button[type="submit"]');
         
+        // Lấy giá trị
+        var fullname = sf.fullname.value.trim();
+        var email = sf.email.value.trim();
+        var password = sf.password.value;
+        var phone = sf.phone ? sf.phone.value.trim().replace(/[\s\-]/g, '') : '';
+        
+        // === VALIDATION PHÍA CLIENT ===
+        
+        // Kiểm tra họ tên
+        if (!fullname) {
+          popup('error', 'Lỗi!', 'Vui lòng nhập họ và tên');
+          return;
+        }
+        
+        // Kiểm tra email
+        if (!email) {
+          popup('error', 'Lỗi!', 'Vui lòng nhập email');
+          return;
+        }
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          popup('error', 'Lỗi!', 'Email không hợp lệ');
+          return;
+        }
+        
+        // Kiểm tra mật khẩu
+        if (!password || password.length < 6) {
+          popup('error', 'Lỗi!', 'Mật khẩu phải có ít nhất 6 ký tự');
+          return;
+        }
+        
+        // Kiểm tra số điện thoại
+        if (!phone) {
+          popup('error', 'Lỗi!', 'Vui lòng nhập số điện thoại');
+          return;
+        }
+        
+        // Chỉ chứa số
+        if (!/^[0-9]+$/.test(phone)) {
+          popup('error', 'Lỗi!', 'Số điện thoại chỉ được chứa chữ số');
+          return;
+        }
+        
+        // Đúng 10 số
+        if (phone.length !== 10) {
+          popup('error', 'Lỗi!', 'Số điện thoại phải có đúng 10 chữ số');
+          return;
+        }
+        
+        // Đầu số hợp lệ (Việt Nam: 03, 05, 07, 08, 09)
+        if (!/^(03|05|07|08|09)[0-9]{8}$/.test(phone)) {
+          popup('error', 'Lỗi!', 'Số điện thoại không hợp lệ (phải bắt đầu bằng 03, 05, 07, 08 hoặc 09)');
+          return;
+        }
+        
+        // === GỬI REQUEST ===
         setButtonLoading(submitBtn, true);
         
         try {
           var data = {
-            fullname: sf.fullname.value,
-            email: sf.email.value,
-            password: sf.password.value,
-            phone: sf.phone ? sf.phone.value : ''
+            fullname: fullname,
+            email: email,
+            password: password,
+            phone: phone
           };
           
           var res = await apiWithRecaptcha('register', data);

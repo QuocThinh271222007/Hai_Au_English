@@ -43,6 +43,10 @@ RewriteRule ^dangnhap$              frontend/pages/login.php [L]
 RewriteRule ^DangKy$                frontend/pages/signup.php [L]
 RewriteRule ^dangky$                frontend/pages/signup.php [L]
 
+# Quên mật khẩu (with query string support for token)
+RewriteRule ^QuenMatKhau$           frontend/pages/forgot-password.php [QSA,L]
+RewriteRule ^quenmatkhau$           frontend/pages/forgot-password.php [QSA,L]
+
 # Trang học viên (profile)
 RewriteRule ^HocVien$               frontend/users/profile.php [L]
 RewriteRule ^hocvien$               frontend/users/profile.php [L]
@@ -50,6 +54,10 @@ RewriteRule ^hocvien$               frontend/users/profile.php [L]
 # Trang quản trị (admin)
 RewriteRule ^QuanTri$               frontend/admin/admin.php [L]
 RewriteRule ^quantri$               frontend/admin/admin.php [L]
+
+# Tuyển dụng
+RewriteRule ^TuyenDung$             frontend/pages/recruitment.php [L]
+RewriteRule ^tuyendung$             frontend/pages/recruitment.php [L]
 
 # Security Headers
 <IfModule mod_headers.c>

@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
         -->
         <div class="teacher-image">
           <img src="${imageUrl}" alt="${teacher.name}" onerror="this.src='${BASE_PATH}/frontend/assets/images/default-avatar.svg'">
+          <!-- TODO: Tạm ẩn IELTS badge - bật lại khi cần
           <div class="teacher-badge">${teacher.ielts_score} IELTS</div>
+          -->
           <!-- TODO: Bật lại overlay xem lịch dạy sau
           <div class="teacher-overlay">
             <span class="view-schedule-btn">📅 Xem lịch dạy</span>
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
           -->
           <h3 class="teacher-name">${teacher.name}</h3>
           <p class="teacher-title">${teacher.title}</p>
-          <p class="teacher-description">${teacher.description}</p>
+          <!-- <p class="teacher-description">${teacher.description}</p> -->
         </div>
       </div>
     `;

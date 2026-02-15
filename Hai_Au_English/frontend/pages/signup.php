@@ -65,16 +65,21 @@ require_once __DIR__ . '/../components/base_config.php';
                     <!-- Phone -->
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            Số điện thoại
+                            Số điện thoại <span class="text-red-500">*</span>
                         </label>
                         <input 
                             type="tel" 
                             id="phone" 
                             name="phone"
                             required
+                            pattern="(03|05|07|08|09)[0-9]{8}"
+                            maxlength="10"
+                            inputmode="numeric"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             placeholder="0912345678"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
                         >
+                        <span class="text-gray-500 text-xs mt-1 block">Nhập đúng 10 số, bắt đầu bằng 03, 05, 07, 08 hoặc 09</span>
                         <span class="text-red-500 text-sm hidden" id="phone-error"></span>
                     </div>
 

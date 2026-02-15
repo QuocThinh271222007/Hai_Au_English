@@ -17,11 +17,10 @@ if (!defined('HAI_AU_CONFIG_LOADED')) {
 // Lấy keys tại: https://www.google.com/recaptcha/admin
 // Chọn reCAPTCHA v3
 
-define('RECAPTCHA_ENABLED', false);  // Đặt true khi đã có keys
-define('RECAPTCHA_SITE_KEY', '');   // ⚠️ THAY BẰNG SITE KEY CỦA BẠN
-define('RECAPTCHA_SECRET_KEY', ''); // ⚠️ THAY BẰNG SECRET KEY CỦA BẠN
-define('RECAPTCHA_MIN_SCORE', 0.5); // Score tối thiểu (0.0 - 1.0), mặc định 0.5
-
+define('RECAPTCHA_ENABLED', true);
+define('RECAPTCHA_SITE_KEY', '6LceJmwsAAAAAIfrfs2SL-x4D8s1dSRVahQ3Aw8X');
+define('RECAPTCHA_SECRET_KEY', '6LceJmwsAAAAAJBGxJDcnR-7qNWDOz07zpiNTP9s');
+define('RECAPTCHA_MIN_SCORE', 0.5);
 // ============================================
 // GOOGLE OAUTH 2.0
 // ============================================
@@ -99,6 +98,12 @@ define('FACEBOOK_USERINFO_URL', 'https://graph.facebook.com/v18.0/me');
  * @return array ['success' => bool, 'score' => float, 'error' => string]
  */
 function verifyRecaptcha($token, $action = 'login') {
+    // Disable reCAPTCHA for localhost testing
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        return ['success' => true, 'score' => 1.0, 'message' => 'reCAPTCHA disabled for localhost'];
+    }
+    
     if (!RECAPTCHA_ENABLED || empty(RECAPTCHA_SECRET_KEY)) {
         return ['success' => true, 'score' => 1.0, 'message' => 'reCAPTCHA disabled'];
     }

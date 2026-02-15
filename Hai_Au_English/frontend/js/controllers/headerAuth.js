@@ -127,9 +127,91 @@
     xhr.send();
   }
 
+  // ============================================
+  // SESSION ACTIVITY TRACKING (Auto-logout after 15 min inactivity)
+  // ============================================
+  var SESSION_CHECK_INTERVAL = 60000; // Check every 1 minute
+  var ACTIVITY_DEBOUNCE = 30000; // Send heartbeat max every 30 seconds
+  var lastActivityTime = Date.now();
+  var lastHeartbeat = 0;
+  var sessionCheckTimer = null;
+  var isUserActive = false;
+
+  // Track user activity
+  function trackActivity() {
+    lastActivityTime = Date.now();
+    isUserActive = true;
+    
+    // Send heartbeat if enough time has passed
+    var now = Date.now();
+    if (now - lastHeartbeat > ACTIVITY_DEBOUNCE) {
+      sendHeartbeat();
+      lastHeartbeat = now;
+    }
+  }
+
+  // Send heartbeat to keep session alive
+  function sendHeartbeat() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', API + '?action=check', true);
+    xhr.withCredentials = true;
+    xhr.onload = function() {
+      if (xhr.status === 401) {
+        // Session expired - redirect to login
+        handleSessionExpired();
+      }
+    };
+    xhr.send();
+  }
+
+  // Handle session expiration
+  function handleSessionExpired() {
+    // Clear any timers
+    if (sessionCheckTimer) {
+      clearInterval(sessionCheckTimer);
+    }
+    
+    // Show notification if possible
+    if (typeof showToast === 'function') {
+      showToast('Phiên đăng nhập đã hết hạn do không hoạt động. Vui lòng đăng nhập lại.', 'warning');
+    } else {
+      alert('Phiên đăng nhập đã hết hạn do không hoạt động. Vui lòng đăng nhập lại.');
+    }
+    
+    // Redirect to login
+    var basePath = getBasePath();
+    setTimeout(function() {
+      window.location.replace(basePath + '/DangNhap');
+    }, 2000);
+  }
+
+  // Setup activity listeners
+  function setupActivityTracking(user) {
+    if (!user) return; // Only track for logged-in users
+    
+    // Activity events
+    var events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(function(event) {
+      document.addEventListener(event, trackActivity, { passive: true });
+    });
+    
+    // Periodic session check
+    sessionCheckTimer = setInterval(function() {
+      // If no activity in the last check interval, verify session
+      if (!isUserActive) {
+        sendHeartbeat();
+      }
+      isUserActive = false;
+    }, SESSION_CHECK_INTERVAL);
+    
+    // Initial heartbeat
+    lastHeartbeat = Date.now();
+  }
+
   function init() {
     checkSession(function(user) {
       updateHeader(user);
+      setupActivityTracking(user);
     });
 
     var logoutBtns = document.querySelectorAll('.logout-btn');

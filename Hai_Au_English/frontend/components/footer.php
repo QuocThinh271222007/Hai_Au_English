@@ -40,6 +40,7 @@ if (!function_exists('s')) {
                         <li><a href="<?php echo $paths['about']; ?>" class="hover:text-white transition-colors">Giới thiệu</a></li>
                         <li><a href="<?php echo $paths['courses']; ?>" class="hover:text-white transition-colors">Khóa học</a></li>
                         <li><a href="<?php echo $paths['teachers']; ?>" class="hover:text-white transition-colors">Giảng viên</a></li>
+                        <li><a href="<?php echo $paths['recruitment']; ?>" class="hover:text-white transition-colors">Tuyển dụng</a></li>
                         <li><a href="<?php echo $paths['contact']; ?>" class="hover:text-white transition-colors">Liên hệ</a></li>
                     </ul>
                 </div>

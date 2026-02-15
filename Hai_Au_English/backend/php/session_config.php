@@ -7,6 +7,9 @@ if (!defined('COOKIE_DOMAIN')) {
     require_once __DIR__ . '/config.php';
 }
 
+// Session inactivity timeout (15 minutes)
+define('SESSION_INACTIVITY_TIMEOUT', 15 * 60);
+
 // Get cookie domain from config (auto-detected)
 $cookieDomain = COOKIE_DOMAIN;
 
@@ -33,6 +36,33 @@ session_set_cookie_params($sessionParams);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Check session inactivity timeout
+function checkSessionInactivity() {
+    if (isset($_SESSION['user_id'])) {
+        $currentTime = time();
+        
+        // Check if last activity exists
+        if (isset($_SESSION['last_activity'])) {
+            $inactiveTime = $currentTime - $_SESSION['last_activity'];
+            
+            // If inactive for more than timeout, destroy session
+            if ($inactiveTime > SESSION_INACTIVITY_TIMEOUT) {
+                session_unset();
+                session_destroy();
+                return false; // Session expired
+            }
+        }
+        
+        // Update last activity time
+        $_SESSION['last_activity'] = $currentTime;
+        return true; // Session active
+    }
+    return false; // No user logged in
+}
+
+// Check and update session activity (call on every authenticated request)
+checkSessionInactivity();
 
 // Don't output anything
 return;

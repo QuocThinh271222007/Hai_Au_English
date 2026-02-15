@@ -60,18 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Example contact form submission (non-AJAX placeholder)
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(contactForm);
-            const data = Object.fromEntries(formData);
-            // In real app, use contactService to submit
-            window.showToast?.('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.', 'success');
-            contactForm.reset();
-        });
-    }
+    // Contact form is handled by contact.js module - DO NOT add handler here
+    // The old placeholder code was removed to avoid conflicts
 
     // Floating Contact Sidebar Toggle (mobile only)
     const floatingToggleBtn = document.getElementById('floating-toggle-btn');

@@ -48,6 +48,7 @@ $paths = [
     'signup' => $basePath . '/DangKy',
     'profile' => $basePath . '/HocVien',
     'admin' => $basePath . '/QuanTri',
+    'recruitment' => $basePath . '/TuyenDung',
 ];
 
 // Đường dẫn assets (CSS, JS, images)

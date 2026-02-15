@@ -1940,7 +1940,9 @@ async function renderTeachers() {
                 </td>
                 <td>${escapeHtml(t.title) || '-'}</td>
                 <td>${t.experience_years ? t.experience_years + ' năm' : '-'}</td>
+                <!-- TODO: Tạm ẩn IELTS - bật lại khi cần
                 <td>${t.ielts_score || '-'}</td>
+                -->
                 <td>
                     <span class="status-badge ${t.is_active ? 'active' : 'cancelled'}">
                         ${t.is_active ? 'Hoạt động' : 'Ẩn'}
@@ -3597,6 +3599,7 @@ function showTeacherModal(teacher = null) {
                     <option value="Giáo sư" ${teacher?.degree === 'Giáo sư' ? 'selected' : ''}>Giáo sư</option>
                 </select>
             </div>
+            <!-- TODO: Tạm ẩn nhập IELTS - bật lại khi cần
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="profile-form-label">Điểm IELTS</label>
@@ -3607,10 +3610,17 @@ function showTeacherModal(teacher = null) {
                     <input type="number" name="experience_years" class="profile-form-input" value="${teacher?.experience_years || 0}" min="0">
                 </div>
             </div>
+            -->
+            <div>
+                <label class="profile-form-label">Kinh nghiệm (năm)</label>
+                <input type="number" name="experience_years" class="profile-form-input" value="${teacher?.experience_years || 0}" min="0">
+            </div>
+            <!-- TODO: Tạm ẩn nhập IELTS - bật lại khi cần 
             <div>
                 <label class="profile-form-label">Mô tả</label>
-                <textarea name="description" class="profile-form-input" rows="3" placeholder="Thông tin về giảng viên...">${escapeHtml(teacher?.description || '')}</textarea>
+                <textarea name="description" class="profile-form-input" rows="3" placeholder="Thông tin về giảng viên...">${escapeHtml(teacher?.description || '')}</textarea> 
             </div>
+            -->
             <div>
                 <label class="profile-form-label">Ảnh đại diện</label>
                 <div class="flex items-start gap-4">

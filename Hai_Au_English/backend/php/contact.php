@@ -1,8 +1,8 @@
 <?php
-// contact.php - Gửi email từ form liên hệ và lưu database
+// contact.php - Gửi email từ form liên hệ
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/notifications.php';
+require_once __DIR__ . '/../service/EmailService.php';
 
 // Set CORS headers using config
 setCorsHeaders();
@@ -18,6 +18,7 @@ $config = [
 
 // Read input (JSON or form-encoded)
 $input = file_get_contents('php://input');
+
 if ($input) {
     $data = json_decode($input, true);
 } else {
@@ -109,47 +110,30 @@ $emailBody = "
 </html>
 ";
 
-// Headers cho email HTML
-$headers = [
-    'MIME-Version: 1.0',
-    'Content-type: text/html; charset=UTF-8',
-    'From: ' . $fullname . ' <' . $email . '>',
-    'Reply-To: ' . $email,
-    'X-Mailer: PHP/' . phpversion()
-];
-
-// Gửi email
-$mailSent = mail(
+// Gửi email bằng EmailService (SMTP)
+$emailService = new EmailService();
+$result = $emailService->send(
     $config['to_email'],
     $config['subject'] . ' - ' . $fullname,
-    $emailBody,
-    implode("\r\n", $headers)
+    $emailBody
 );
 
-// Lưu vào database
-$contactId = null;
-try {
-    $pdo = getDBConnection();
-    $stmt = $pdo->prepare("
-        INSERT INTO contacts (fullname, email, phone, course, level, message, agreement)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([$fullname, $email, $phone, $course, $level, $message, $agreement]);
-    $contactId = $pdo->lastInsertId();
-    
-    // Tạo thông báo cho admin
-    createAdminNotification(
-        'contact',
-        'Liên hệ mới từ website',
-        "{$fullname} ({$phone}) quan tâm khóa học {$course}. Email: {$email}",
-        $contactId,
-        'contacts'
-    );
-} catch (Exception $e) {
-    error_log("Save Contact Error: " . $e->getMessage());
-}
+$mailSent = $result['success'];
 
-if ($mailSent || $contactId) {
+if ($mailSent) {
+    // Tạo thông báo cho admin
+    try {
+        createAdminNotification(
+            'contact',
+            'Liên hệ mới từ website',
+            "{$fullname} ({$phone}) quan tâm khóa học {$course}. Email: {$email}",
+            null,
+            null
+        );
+    } catch (Exception $e) {
+        error_log("Create Notification Error: " . $e->getMessage());
+    }
+    
     echo json_encode([
         'success' => true, 
         'message' => 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ sớm nhất.'

@@ -4,7 +4,7 @@
 Options -Indexes
 
 # Block access to sensitive PHP files
-<FilesMatch "^(db|session_config)\.php$">
+<FilesMatch "^(db|session_config|config|oauth_config)\.php$">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -16,7 +16,7 @@ Options -Indexes
 </FilesMatch>
 
 # Allow only specific PHP endpoints
-<FilesMatch "^(auth|courses|teachers|contact|profile|admin|users|test_schedule)\.php$">
+<FilesMatch "^(auth|courses|teachers|contact|profile|admin|users|test_schedule|oauth_callback|reviews|achievements|notifications|teacher_reviews|course_fees|test_email|test_hostinger)\.php$">
     Order allow,deny
     Allow from all
 </FilesMatch>

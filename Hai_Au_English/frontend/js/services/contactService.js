@@ -8,8 +8,10 @@ export const contactService = {
     const res = await fetch(API_BASE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(contactData)
     });
+    
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Lỗi gửi liên hệ');
     return data;
