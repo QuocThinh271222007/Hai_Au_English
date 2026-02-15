@@ -14,8 +14,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =============================================
 -- TẠO DATABASE (nếu cần)
 -- =============================================
-CREATE DATABASE IF NOT EXISTS `hai_au_english` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `hai_au_english`;
+-- CREATE DATABASE IF NOT EXISTS `hai_au_english` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE `hai_au_english`;
 
 -- =============================================
 -- XÓA TẤT CẢ CÁC BẢNG THEO THỨ TỰ

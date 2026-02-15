@@ -1,14 +1,18 @@
 <?php
 
+<<<<<<< HEAD
 // Load PHPMailer autoloader (config phải được load trước khi gọi class này)
 require_once __DIR__ . '/../vendor/autoload.php';
 
+=======
+>>>>>>> f4b95be7fe27c8af6a8f6a6cbb258ea29d4a6733
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 class EmailService
 {
+<<<<<<< HEAD
     function send($to, $subject, $content, $fromName = 'Hải Âu English')
     {
         // Đảm bảo config đã được load
@@ -16,6 +20,10 @@ class EmailService
             require_once __DIR__ . '/../php/config.php';
         }
         
+=======
+    function send($to, $subject, $content)
+    {
+>>>>>>> f4b95be7fe27c8af6a8f6a6cbb258ea29d4a6733
         //Create an instance; passing `true` enables exceptions
         $mail = new PHPMailer(true);
         $mail->CharSet = "UTF-8";
@@ -31,7 +39,11 @@ class EmailService
             $mail->Port       = 465; //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             //Recipients
+<<<<<<< HEAD
             $mail->setFrom(SMTP_USERNAME, $fromName);
+=======
+            $mail->setFrom(SMTP_USERNAME);
+>>>>>>> f4b95be7fe27c8af6a8f6a6cbb258ea29d4a6733
             $mail->addAddress($to); //Add a recipient
 
             //Content
@@ -40,9 +52,14 @@ class EmailService
             $mail->Body    = $content;
 
             $mail->send();
+<<<<<<< HEAD
             return ['success' => true, 'message' => 'Email sent successfully'];
         } catch (Exception $e) {
             return ['success' => false, 'error' => "Mailer Error: {$mail->ErrorInfo}"];
+=======
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+>>>>>>> f4b95be7fe27c8af6a8f6a6cbb258ea29d4a6733
         }
     }
 }

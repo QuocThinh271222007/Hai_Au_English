@@ -134,9 +134,12 @@ define('SMTP_HOST', 'smtp.gmail.com');
 // quan trọng (người nhận mail)
 define('SHOP_OWNER', 'haiauenglish@gmail.com');
 
+<<<<<<< HEAD
 // Token expiration time (for password reset)
 define('PASSWORD_RESET_EXPIRY', 15 * 60); // 15 phút
 
+=======
+>>>>>>> f4b95be7fe27c8af6a8f6a6cbb258ea29d4a6733
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
