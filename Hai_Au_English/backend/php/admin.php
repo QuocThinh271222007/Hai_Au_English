@@ -393,8 +393,11 @@ try {
                 ? json_encode($data['features']) 
                 : '[]';
             
+            // Handle age_group/category - support both field names
+            $age_group = $data['age_group'] ?? $data['category'] ?? 'tieuhoc';
+            
             $stmt = $pdo->prepare("
-                INSERT INTO courses (name, description, image_url, level, duration, curriculum, price, price_unit, category, badge, target, total_sessions, is_active, features)
+                INSERT INTO courses (name, description, image_url, level, duration, curriculum, price, price_unit, age_group, badge, target, total_sessions, is_active, features)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
@@ -406,7 +409,7 @@ try {
                 $data['curriculum'] ?? '',
                 $data['price'] ?? 0,
                 $data['price_unit'] ?? '/tháng',
-                $data['category'] ?? 'group',
+                $age_group,
                 $data['badge'] ?? null,
                 $data['target'] ?? '',
                 $data['total_sessions'] ?? 0,
@@ -470,10 +473,13 @@ try {
                 ? json_encode($data['features']) 
                 : '[]';
             
+            // Handle age_group/category - support both field names
+            $age_group = $data['age_group'] ?? $data['category'] ?? 'tieuhoc';
+            
             $stmt = $pdo->prepare("
                 UPDATE courses SET 
                     name = ?, description = ?, image_url = ?, level = ?, 
-                    duration = ?, curriculum = ?, price = ?, price_unit = ?, category = ?,
+                    duration = ?, curriculum = ?, price = ?, price_unit = ?, age_group = ?,
                     badge = ?, target = ?, total_sessions = ?, is_active = ?, features = ?
                 WHERE id = ?
             ");
@@ -486,7 +492,7 @@ try {
                 $data['curriculum'] ?? '',
                 $data['price'] ?? 0,
                 $data['price_unit'] ?? '/tháng',
-                $data['category'] ?? 'group',
+                $age_group,
                 $data['badge'] ?? null,
                 $data['target'] ?? '',
                 $data['total_sessions'] ?? 0,
