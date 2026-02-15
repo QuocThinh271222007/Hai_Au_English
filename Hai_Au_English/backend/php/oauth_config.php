@@ -16,6 +16,16 @@ if (!defined('HAI_AU_CONFIG_LOADED')) {
 // ============================================
 // Lấy keys tại: https://www.google.com/recaptcha/admin
 // Chọn reCAPTCHA v3
+// 
+// HƯỚNG DẪN:
+// 1. Truy cập https://www.google.com/recaptcha/admin/create
+// 2. Chọn "reCAPTCHA v3"
+// 3. Thêm domain: localhost, 127.0.0.1, yourdomain.com
+// 4. Copy Site Key và Secret Key vào đây
+// 5. Đặt RECAPTCHA_ENABLED = true
+//
+// ⚠️ TRÊN LOCALHOST (XAMPP): reCAPTCHA sẽ tự động bị bỏ qua
+// ⚠️ TRÊN HOSTINGER: Cần key hợp lệ nếu RECAPTCHA_ENABLED = true
 
 define('RECAPTCHA_ENABLED', true);
 define('RECAPTCHA_SITE_KEY', '6LceJmwsAAAAAIfrfs2SL-x4D8s1dSRVahQ3Aw8X');
@@ -97,7 +107,7 @@ define('FACEBOOK_USERINFO_URL', 'https://graph.facebook.com/v18.0/me');
  * @param string $action Expected action name
  * @return array ['success' => bool, 'score' => float, 'error' => string]
  */
-function verifyRecaptcha($token, $action = 'login') {
+function verifyRecaptcha($token, $action = null) {
     // Disable reCAPTCHA for localhost testing
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
@@ -113,47 +123,68 @@ function verifyRecaptcha($token, $action = 'login') {
     }
     
     $url = 'https://www.google.com/recaptcha/api/siteverify';
-    $data = [
+    $postData = [
         'secret' => RECAPTCHA_SECRET_KEY,
         'response' => $token,
         'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
     ];
     
-    $options = [
-        'http' => [
-            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-            'method'  => 'POST',
-            'content' => http_build_query($data)
-        ]
-    ];
-    
-    $context = stream_context_create($options);
-    $result = @file_get_contents($url, false, $context);
-    
-    if ($result === false) {
-        // If verification fails, allow login but log it
-        error_log('reCAPTCHA verification failed - network error');
-        return ['success' => true, 'score' => 0.5, 'message' => 'Verification skipped'];
+    // Use cURL for better Hostinger compatibility
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+        
+        if ($result === false || $httpCode !== 200) {
+            error_log('reCAPTCHA cURL error: ' . $curlError . ', HTTP: ' . $httpCode);
+            // Allow on network error to not block legitimate users
+            return ['success' => true, 'score' => 0.5, 'message' => 'Verification skipped due to network error'];
+        }
+    } else {
+        // Fallback to file_get_contents
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($postData),
+                'timeout' => 15
+            ]
+        ];
+        
+        $context = stream_context_create($options);
+        $result = @file_get_contents($url, false, $context);
+        
+        if ($result === false) {
+            error_log('reCAPTCHA file_get_contents failed');
+            return ['success' => true, 'score' => 0.5, 'message' => 'Verification skipped'];
+        }
     }
     
     $response = json_decode($result, true);
     
-    if (!$response['success']) {
+    if (!isset($response['success']) || !$response['success']) {
+        $errorCodes = $response['error-codes'] ?? ['unknown'];
+        error_log('reCAPTCHA API error: ' . implode(', ', $errorCodes));
         return [
             'success' => false, 
             'score' => 0, 
-            'error' => 'reCAPTCHA verification failed: ' . implode(', ', $response['error-codes'] ?? ['unknown'])
+            'error' => 'reCAPTCHA verification failed: ' . implode(', ', $errorCodes)
         ];
     }
     
-    // Check action matches
-    if (isset($response['action']) && $response['action'] !== $action) {
-        return ['success' => false, 'score' => 0, 'error' => 'Invalid reCAPTCHA action'];
-    }
-    
-    // Check score
-    $score = $response['score'] ?? 0;
+    // For v3, check score
+    $score = $response['score'] ?? 1.0;
     if ($score < RECAPTCHA_MIN_SCORE) {
+        error_log('reCAPTCHA score too low: ' . $score);
         return [
             'success' => false, 
             'score' => $score, 

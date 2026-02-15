@@ -1,5 +1,7 @@
 <?php
 
+// Load PHPMailer autoloader (config phải được load trước khi gọi class này)
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -15,6 +17,7 @@ class EmailService
             require_once __DIR__ . '/../php/config.php';
         }
 
+        //Create an instance; passing `true` enables exceptions
         $mail = new PHPMailer(true);
         $mail->CharSet = "UTF-8";
 
@@ -27,9 +30,11 @@ class EmailService
             $mail->Password   = SMTP_SECRET;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
-
             $mail->setFrom(SMTP_USERNAME, $fromName);
             $mail->addAddress($to);
+            //Recipients
+            $mail->setFrom(SMTP_USERNAME, $fromName);
+            $mail->addAddress($to); //Add a recipient
 
             $mail->isHTML(true);
             $mail->Subject = $subject;
@@ -46,6 +51,10 @@ class EmailService
                 'success' => false,
                 'error'   => "Mailer Error: {$mail->ErrorInfo}"
             ];
+
+            return ['success' => true, 'message' => 'Email sent successfully'];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => "Mailer Error: {$mail->ErrorInfo}"];
         }
     }
 }

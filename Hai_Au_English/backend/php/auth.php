@@ -15,18 +15,34 @@ $action = $_GET['action'] ?? '';
 
 /**
  * Verify reCAPTCHA token if enabled
+ * Supports reCAPTCHA v3
  */
 function checkRecaptcha($data) {
+    // Check if reCAPTCHA is disabled in config
     if (!RECAPTCHA_ENABLED || empty(RECAPTCHA_SECRET_KEY)) {
         return true;
     }
     
+    // Skip reCAPTCHA on localhost (XAMPP)
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        return true;
+    }
+    
     $token = $data['recaptcha_token'] ?? '';
+    
+    // No token = cannot verify
     if (empty($token)) {
+        error_log('reCAPTCHA: No token provided by frontend');
         return false;
     }
     
     $result = verifyRecaptcha($token);
+    
+    if (!$result['success']) {
+        error_log('reCAPTCHA verification failed: ' . ($result['error'] ?? 'unknown'));
+    }
+    
     return $result['success'] === true;
 }
 
